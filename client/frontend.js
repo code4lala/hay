@@ -1,5 +1,34 @@
 'use strict'
 
+const sdfasfadsfwebSocketServer = require('websocket').server
+
+
+Vue.component('history_msg', {
+    template: '\
+    <li>\
+    {{ m_time }} : {{ m_data }} \
+    </li>\
+    ',
+    props: ['m_time', 'm_data']
+    // TODO props不知道是啥
+})
+const chat_app = new Vue({
+    el: '#chat-app',
+    data: {
+        msg_to_be_send: '',
+        messages: [{
+            msg_time: (new Date()).toLocaleString(),
+            msg_data: '欢迎光临',
+        }],
+    },
+    methods: {
+        send_message: function () {
+            console.log(this.msg_to_be_send)
+            // TODO 发送消息的逻辑
+        }
+    }
+})
+
 $(function () {
     const content = $('#content')
     const input = $('#input')
@@ -10,11 +39,7 @@ $(function () {
     window.WebSocket = window.WebSocket || window.MozWebSocket
     // 如果浏览器不支持WebSocket则退出
     if (!window.WebSocket) {
-        content.html($('<p>', {
-            text: '您的浏览器不支持WebSocket'
-        }))
-        input.hide()
-        $('span').hide()
+        alert('您的浏览器不支持 WebSocket')
         return
     }
 

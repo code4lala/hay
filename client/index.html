@@ -11,6 +11,22 @@
     <title>How Are You</title>
 </head>
 <body>
+<div id='chat-app'>
+    <form v-on:submit.prevent='send_message'>
+        <input v-model='msg_to_be_send'
+               id='msg_sent'
+        >
+        <button>发送</button>
+    </form>
+    <ul>
+        <li is='history_msg'
+            v-for='(msg, index) in messages'
+            v-bind:key='msg.msg_time'
+            v-bind:m_data='msg.msg_data'
+            v-bind:m_time='msg.msg_time'
+        ></li>
+    </ul>
+</div>
 <div id='content'>
     <div>
         <span id='status'>Connecting...</span>
