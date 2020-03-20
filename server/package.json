@@ -4,9 +4,10 @@
   "description": "IM server",
   "main": "index.js",
   "scripts": {
-    "test": "node index.js"
+    "run": "node index.js"
   },
   "author": "",
+  "keywords": [],
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "websocket": "^1.0.31"
