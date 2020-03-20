@@ -1,10 +1,30 @@
 import Vue from 'vue'
-import ClientUi from './client-ui'
+import VueRouter from 'vue-router'
 
-Vue.config.productionTip = false
+import ClientUi from './client-ui'
+import ClientLogin from './client-login'
+import App from './App'
+
+Vue.use(VueRouter)
+
+const router = new VueRouter({
+    routes: [
+        {
+            path: '/hay',
+            component: ClientUi
+        },
+        {
+            path: '/',
+            component: ClientLogin
+        }
+    ]
+})
 
 new Vue({
-    render: createElement => createElement(ClientUi),
+    router: router,
+    render: function (createElement) {
+        return createElement(App)
+    }
 }).$mount('#hay-client')
 
 // 常量
