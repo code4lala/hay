@@ -7,29 +7,33 @@ new Vue({
     render: createElement => createElement(ClientUi),
 }).$mount('#hay-client')
 
+// 常量
+const SERVER_URL = 'ws://127.0.0.1:10086'
+
 const fn_init = function () {
     console.log('init...')
     // 如果用户运行在 mozilla 就用内置的 WebSocket
     window.WebSocket = window.WebSocket || window.MozWebSocket
     // 如果浏览器不支持WebSocket则退出
     if (!window.WebSocket) {
-        alert('您的浏览器不支持 WebSocket')
+        alert('您的浏览器不支持 WebSocket 因此无法运行该应用')
         return
     }
-
-    const SERVER_URL = 'ws://127.0.0.1:10086'
 
     // 开启连接
     const connection = new WebSocket(SERVER_URL)
     // 处理三个函数 onopen onerror onmessage
 
-    connection.onopen = function () {
+    connection.onopen = function (event) {
         // 连接已就绪 TODO
-        console.log('成功连接到服务器 ' + SERVER_URL)
+        console.log('成功连接到服务器 ' + event.target.url + ', 报告的事件如下:')
+        console.log(event)
     }
 
-    connection.onerror = function () {
+    connection.onerror = function (event) {
         // 发送/接收数据时失败 TODO
+        console.log('发送或接收数据时发生错误如下:')
+        console.log(event)
     }
 
     // 处理服务器发来的消息

@@ -15,19 +15,29 @@
         <main role="main">
             <div class="row">
                 <div class="col-sm-3 col-md-6 col-lg-4 col-xl-2 bg-success">
-                    消息列表<br>
-                    消息列表<br>
-                    消息列表<br>
-                    消息列表<br>
-                    消息列表<br>
-                    消息列表<br>
+                    好友列表<br>
+                    好友列表<br>
+                    好友列表<br>
+                    好友列表<br>
+                    好友列表<br>
+                    好友列表<br>
+                    好友列表<br>
+                    好友列表<br>
+                    好友列表<br>
+                    好友列表<br>
+                    好友列表<br>
                 </div>
                 <div class="col-sm-9 col-md-6 col-lg-8 col-xl-10">
-                    聊天区域
+                    聊天区域<br>
+                    消息列表<br>
+                    消息列表<br>
+                    消息列表<br>
+                    消息列表<br>
+                    消息列表<br>
+                    消息列表<br>
                     <BaseInputText
                             v-model='msg_to_be_sent'
                             input_id="input_name_msg_to_be_sent"
-                            input_label='发送消息'
                             input_placeholder='在此输入要发送的消息...'
                             v-on:keydown.enter='fn_send_msg'></BaseInputText>
                 </div>

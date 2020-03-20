@@ -7,6 +7,9 @@ const http = require('http')
 
 let history = []
 let clients = []
+const clog = function (arg) {
+    console.log((new Date()) + ' ' + arg)
+}
 
 function htmlEntities(str) {
     return String(str)
@@ -20,7 +23,7 @@ function htmlEntities(str) {
 const server = http.createServer(function (request, response) {
 })
 server.listen(webSocketServerPort, function () {
-    console.log((new Date()) + ' Server is listening on port '
+    clog('Server is listening on port '
         + webSocketServerPort)
 })
 // WebSocket server
@@ -30,7 +33,7 @@ const wsServer = new webSocketServer({
 
 // 连接回调函数
 wsServer.on('request', function (request) {
-    console.log((new Date()) + ' Connection from origin '
+    clog('Connection from origin '
         + request.origin)
 
     // 接受连接
@@ -38,7 +41,7 @@ wsServer.on('request', function (request) {
     const index = clients.push(connection) - 1
     let userName = false;
 
-    console.log((new Date()) + ' Connection accepted')
+    clog('Connection accepted')
 
     // 返回历史消息
     if (history.length > 0) {
@@ -58,10 +61,10 @@ wsServer.on('request', function (request) {
                     data: userName
                 }))
 
-                console.log((new Date()) + ' User is known as: ' + userName)
+                clog('User is known as: ' + userName)
             } else {
                 // 登录并广播
-                console.log((new Date()) + ' Received message from '
+                clog('Received message from '
                     + userName + ': ' + message.utf8Data)
 
                 // 保存所有已发送消息
@@ -84,14 +87,24 @@ wsServer.on('request', function (request) {
     // 用户断开连接
     connection.on('close', function (connection) {
         if (userName !== false) {
-            console.log((new Date()) + ' Peer '
+            clog('Peer '
                 + connection.remoteAddress + ' disconnected')
 
             // 从已连接列表中移除该客户端
             clients.splice(index, 1)
         }
     })
+
+    connection.on('error', function (error) {
+        if (error.code === 'ECONNRESET') {
+            clog('用户离线')
+            // TODO
+        } else {
+            clog('连接出错: ')
+            clog(error)
+        }
+    })
 })
 
 
-console.log('last line')
+clog('last line')
