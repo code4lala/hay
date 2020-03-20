@@ -15,26 +15,10 @@
         <main role="main">
             <div class="row">
                 <div class="col-sm-3 col-md-6 col-lg-4 col-xl-2 bg-success">
-                    好友列表<br>
-                    好友列表<br>
-                    好友列表<br>
-                    好友列表<br>
-                    好友列表<br>
-                    好友列表<br>
-                    好友列表<br>
-                    好友列表<br>
-                    好友列表<br>
-                    好友列表<br>
-                    好友列表<br>
+                    好友列表<br> 好友列表<br> 好友列表<br> 好友列表<br> 好友列表<br> 好友列表<br> 好友列表<br> 好友列表<br> 好友列表<br> 好友列表<br> 好友列表<br>
                 </div>
                 <div class="col-sm-9 col-md-6 col-lg-8 col-xl-10">
-                    聊天区域<br>
-                    消息列表<br>
-                    消息列表<br>
-                    消息列表<br>
-                    消息列表<br>
-                    消息列表<br>
-                    消息列表<br>
+                    聊天区域<br> 消息列表<br> 消息列表<br> 消息列表<br> 消息列表<br> 消息列表<br> 消息列表<br>
                     <BaseInputText
                             v-model='msg_to_be_sent'
                             input_id="input_name_msg_to_be_sent"
@@ -61,7 +45,6 @@
 <script>
     import BaseInputText from './components/base/BaseInputText'
 
-
     export default {
         name: 'client-ui',
         components: {BaseInputText},
@@ -76,7 +59,6 @@
             },
             fn_connect_to_server: function () {
                 console.log('连接到服务器')
-
             }
         }
     }

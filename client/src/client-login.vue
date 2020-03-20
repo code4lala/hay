@@ -24,6 +24,8 @@
         methods: {
             fn_login: function () {
                 console.log('在此登录 用户名为: ' + this.login_name)
+
+                // TODO 怎么传递消息给App.vue组件
             }
         }
     }
