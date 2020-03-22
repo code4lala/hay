@@ -1,6 +1,6 @@
 <template>
-  <div id="app">
-    <router-view/>
+  <div>
+    设置界面
   </div>
 </template>
 
@@ -8,8 +8,10 @@
   import {Component, Prop, Vue} from 'vue-property-decorator'
 
   @Component
-  export default class App extends Vue {
+  export default class Setting extends Vue {
   }
 </script>
 
-<style></style>
+<style scoped>
+
+</style>
