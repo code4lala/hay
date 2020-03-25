@@ -1,43 +1,51 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
+import Global from "@/store/global";
+
 Vue.use(Vuex);
 
-export default new Vuex.Store({
-  state: {
-    connection: new WebSocket('ws://127.0.0.1:10086')
+enum MSG_TYPE {
+  LOGIN,
+  CHAT,
+}
+
+function fnBuildMsg(type: MSG_TYPE, content: string): string {
+  return JSON.stringify({
+    type: type,
+    data: content
+  })
+}
+
+export default new Vuex.Store<any>({
+  state: function () {
+    return {
+      userName: ''
+    }
   },
   mutations: {
-
-    /*
-    Property 'onmessage' does not exist on type 'Mutation<{ connection: WebSocket; }>'. TODO
-    https://www.google.com/search?q=typescript+websocket
-    https://medium.com/dailyjs/real-time-apps-with-typescript-integrating-web-sockets-node-angular-e2b57cbd1ec1
-    websocket typescript 的示例
-     */
-
-    /*
-
-    fnInit() {
-      console.log('init...')
+    fnInitConnection() {
+      console.log('init websocket...')
 
       // 开启连接
+      Global.connection = new WebSocket('ws://127.0.0.1:10086')
+
       // 处理三个函数 onopen onerror onmessage
 
-      this.connection.onopen = function (event: Event) {
+      Global.connection.onopen = function (event: any) {
         // 连接已就绪 TODO
         console.log('成功连接到服务器')
-        console.log(event)
+        console.log(event.target.url)
       }
 
-      this.connection.onerror = function (event: Event) {
+      Global.connection.onerror = function (event: Event) {
         // 发送/接收数据时失败 TODO
         console.log('发送或接收数据时发生错误如下:')
         console.log(event)
       }
 
       // 处理服务器发来的消息
-      this.connection.onmessage = function (messageEvent: MessageEvent) {
+      Global.connection.onmessage = function (messageEvent: MessageEvent) {
         // 处理消息 TODO
         let json = null
         try {
@@ -75,13 +83,20 @@ export default new Vuex.Store({
         }
       }
     },
-    fn_send_by_connection: function (msg_content: string) {
-      this.connection.send(msg_content)
+
+    fnSendByConnection: function (msgContent: string) {
+      Global.connection.send(msgContent)
       // TODO 发送消息
-      console.log('消息: `' + msg_content + '`已发送')
+      console.log('消息: `' + msgContent + '`已发送')
+
     },
 
-     */
+    fnLoginByConnection: function (state: any, userName: string) {
+      // TODO 登录设置用户名
+      console.log('登录用户名为' + userName)
+      Global.connection.send(fnBuildMsg(MSG_TYPE.LOGIN, userName))
+      console.log('正在登录')
+    }
   },
   actions: {},
   modules: {}

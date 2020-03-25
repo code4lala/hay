@@ -1,13 +1,26 @@
 <template>
   <li>
-
+    {{strUserName}} @ {{dateTime}} : {{strMsg}}
   </li>
 </template>
 
 <script lang='js'>
-  // TODO js to ts
   export default {
-    name: 'HistoryMsgItem'
+    name: 'HistoryMsgItem',
+    props: {
+      strUserName: {
+        type: String,
+        required: true
+      },
+      strMsg: {
+        type: String,
+        required: true
+      },
+      dateTime: {
+        type: Date,
+        required: true
+      }
+    }
   }
 </script>
 

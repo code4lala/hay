@@ -10,3 +10,16 @@ new Vue({
   store,
   render: h => h(App)
 }).$mount("#app");
+
+// 初始化
+store.commit('fnInitConnection')
+
+if (store.state.userName === '') {
+  if (router.currentRoute.fullPath === '/login') {
+    console.log('未登录，已在登录界面，无需重定向')
+  } else {
+    console.log('未登录，正在重定向')
+    router.push('/login')
+  }
+}
+

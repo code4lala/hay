@@ -10,7 +10,9 @@
   </div>
 </template>
 
-<script>
+<script lang='js'>
+  import store from '@/store/index'
+
   import BaseInputText from '@/components/base/BaseInputText'
 
   export default {
@@ -23,9 +25,11 @@
     },
     methods: {
       fnLogin: function () {
-        console.log('在此登录 用户名为: ' + this.strLoginName)
+        console.log('即将发送网络请求进行登录...')
+        console.log('用户名为: ' + this.strLoginName)
 
-        // TODO 怎么调用发送消息的函数
+        // 调用发送消息的函数
+        store.commit('fnLoginByConnection', this.strLoginName)
       }
     }
   }
