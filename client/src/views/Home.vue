@@ -28,5 +28,5 @@
     get currentTabComponent() {
       return this.currentTab
     }
-  };
+  }
 </script>
