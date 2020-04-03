@@ -78,7 +78,16 @@ MSG_HANDLER[MSG_TYPE.CHAT] = function (conn: any, data: string) {
 MSG_HANDLER[MSG_TYPE.GET_FRIENDS] = function (conn: any, data: string) {
   clt('获取好友处理器')
   cl(data)
-  // TODO 获取好友列表
+  dbo.collection('friend_list').find({
+    a: data
+  }).toArray(function (err: any, result: Array<any>) {
+    if (err) throw err
+    cl(result)
+    conn.sendUTF(JSON.stringify({
+      type: MSG_BACK_TYPE.GOT_FRIENDS,
+      data: JSON.stringify(result)
+    }))
+  })
 }
 
 // HTTP server
@@ -113,7 +122,6 @@ function wsServerOnRequest(request: any) {
   // 用户发送消息
   connection.on('message', function (message: any) {
     if (message.type !== 'utf8') return
-    // 记住用户名
     let msgObj
     try {
       msgObj = JSON.parse(message.utf8Data)

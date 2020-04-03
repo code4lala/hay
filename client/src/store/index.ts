@@ -38,7 +38,8 @@ function fnBuildMsg(type: MSG_TYPE, content: string): string {
 const store = new Vuex.Store<any>({
   state: function () {
     return {
-      userName: ''
+      userName: '',
+      arrayFriendItems: []
     }
   },
   mutations: {
@@ -104,7 +105,7 @@ MSG_HANDLER[MSG_BACK_TYPE.LOGIN_SUCC] = function (data: string) {
   store.state.userName = data
   store.commit('fnSendByConnection', fnBuildMsg(
     MSG_TYPE.GET_FRIENDS,
-    ''
+    store.state.userName
   ))
   cl('已重定向到聊天界面')
 }
@@ -113,8 +114,18 @@ MSG_HANDLER[MSG_BACK_TYPE.LOGIN_FAIL] = function (data: string) {
   cl('服务端返回的消息为: ' + data)
   alert(data + '登录失败')
 }
-MSG_HANDLER[MSG_BACK_TYPE.GOT_FRIENDS] = function () {
-  // TODO 获取好友列表
+MSG_HANDLER[MSG_BACK_TYPE.GOT_FRIENDS] = function (data: any) {
+  cl('获取到好友列表啦')
+  data = JSON.parse(data)
+  cl(data)
+  const friendsItem: any = []
+  for (let i = 0; i < data.length; i++) {
+    friendsItem.push({
+      name: data[i].b
+    })
+  }
+  cl('组合的好友列表如下')
+  store.state.arrayFriendItems = friendsItem
 }
 
 

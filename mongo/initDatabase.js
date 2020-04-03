@@ -1,9 +1,30 @@
 // 这个在Navicat里边执行
 use hay
+db.dropDatabase()
+
+use hay
 db.createCollection('user')
 db.user.insert([{
-    name: '张三'
+    name: '小可爱'
 }, {
-    name: '李四'
+    name: '小美丽'
+}, {
+    name: '小漂亮'
 }])
 db.user.find()
+
+db.createCollection('friend_list')
+db.friend_list.insert([{
+    a: '小可爱',
+    b: '小美丽'
+}, {
+    a: '小美丽',
+    b: '小可爱'
+}, {
+    a: '小可爱',
+    b: '小漂亮'
+}, {
+    a: '小漂亮',
+    b: '小可爱'
+}])
+db.friend_list.find()

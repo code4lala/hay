@@ -15,7 +15,8 @@
     <main role="main">
       <div class="row">
         <div class="col-sm-3 col-md-6 col-lg-4 col-xl-2 bg-success">
-          好友列表
+          <FriendList>
+          </FriendList>
         </div>
         <div class="col-sm-9 col-md-6 col-lg-8 col-xl-10">
           <HistoryMsgList>
@@ -48,9 +49,11 @@
   import {Component, Prop, Vue} from 'vue-property-decorator'
   import BaseInputText from "@/components/base/BaseInputText.vue"
   import HistoryMsgList from '@/components/chat_ui/HistoryMsgList.vue'
+  import FriendList from "@/components/chat_ui/FriendList.vue";
 
   @Component({
     components: {
+      FriendList,
       HistoryMsgList,
       BaseInputText
     }
