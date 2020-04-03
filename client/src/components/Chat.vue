@@ -4,7 +4,7 @@
     <header>
       <div class="row">
         <div class="col-sm-3 col-md-6 col-lg-4 col-xl-2 bg-info">
-          Hay!
+          Hay! {{ $store.state.userName }}
         </div>
         <div class="col-sm-9 col-md-6 col-lg-8 col-xl-10 bg-warning">
           How are you!

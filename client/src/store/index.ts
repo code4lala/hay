@@ -14,25 +14,19 @@ const ce = console.error
 enum MSG_BACK_TYPE {
   LOGIN_SUCC,
   LOGIN_FAIL,
+  GOT_FRIENDS,
 }
 
 enum MSG_TYPE {
   LOGIN,
+  GET_FRIENDS,
   CHAT,
 }
 
 // 以上是客户端服务端公共部分 }}}
 
-const MSG_HANDLER: any = []
-MSG_HANDLER[MSG_BACK_TYPE.LOGIN_SUCC] = function (data: string) {
-  cl('登录成功啦')
-  cl('服务端返回的消息为: ' + data)
-  router.push('/')
-}
-MSG_HANDLER[MSG_BACK_TYPE.LOGIN_FAIL] = function () {
-  // TODO
-}
 
+const MSG_HANDLER: any = []
 
 function fnBuildMsg(type: MSG_TYPE, content: string): string {
   return JSON.stringify({
@@ -41,7 +35,7 @@ function fnBuildMsg(type: MSG_TYPE, content: string): string {
   })
 }
 
-export default new Vuex.Store<any>({
+const store = new Vuex.Store<any>({
   state: function () {
     return {
       userName: ''
@@ -74,6 +68,8 @@ export default new Vuex.Store<any>({
         let msgObj = null
         try {
           msgObj = JSON.parse(messageEvent.data)
+          cl('解析出的msgObj如下')
+          cl(msgObj)
         } catch (e) {
           ce(e)
           ce('服务端返回数据不是JSON: ' + messageEvent.data)
@@ -82,45 +78,16 @@ export default new Vuex.Store<any>({
 
         MSG_HANDLER[msgObj.type](msgObj.data)
 
-        // TODO 写到这里啦....!!!!!!
-
-        // 填充消息
-        function addMessage(author: string, message: string, dt: string) {
-          // TODO 填充消息
-          cl(author + message + dt)
-        }
-
-
-        // 处理接收到的消息
-        if (msgObj.type === 'history') {
-
-          for (let i = 0; i < msgObj.data.length; i++) {
-            addMessage(msgObj.data[i].author, msgObj.data[i].text,
-              new Date(msgObj.data[i].time).toLocaleString())
-          }
-        } else if (msgObj.type === 'message') {
-          // TODO 设置不可以输入
-          addMessage(msgObj.data.author, msgObj.data.text,
-            new Date(msgObj.data.time).toLocaleString())
-        } else if (msgObj.type === 'name_set') {
-          // TODO 设置可以输入
-          addMessage(msgObj.data.author, '用户名为' + msgObj.data.text,
-            new Date(msgObj.data.time).toLocaleString())
-        } else {
-          cl('接收到的消息格式不正确')
-        }
       }
     },
 
-    fnSendByConnection: function (msgContent: string) {
-      Global.connection.send(msgContent)
-      // TODO 发送消息
-      cl('消息: `' + msgContent + '`已发送')
-
+    fnSendByConnection: function (state: any, msg: any) {
+      Global.connection.send(msg)
+      cl('已发送如下消息至服务端')
+      cl(msg)
     },
 
     fnLoginByConnection: function (state: any, userName: string) {
-      // TODO 登录设置用户名
       cl('登录用户名为' + userName)
       Global.connection.send(fnBuildMsg(MSG_TYPE.LOGIN, userName))
       cl('正在登录')
@@ -129,3 +96,26 @@ export default new Vuex.Store<any>({
   actions: {},
   modules: {}
 });
+
+MSG_HANDLER[MSG_BACK_TYPE.LOGIN_SUCC] = function (data: string) {
+  cl('登录成功啦')
+  cl('服务端返回的消息为: ' + data)
+  router.push('/')
+  store.state.userName = data
+  store.commit('fnSendByConnection', fnBuildMsg(
+    MSG_TYPE.GET_FRIENDS,
+    ''
+  ))
+  cl('已重定向到聊天界面')
+}
+MSG_HANDLER[MSG_BACK_TYPE.LOGIN_FAIL] = function (data: string) {
+  cl('登录失败')
+  cl('服务端返回的消息为: ' + data)
+  alert(data + '登录失败')
+}
+MSG_HANDLER[MSG_BACK_TYPE.GOT_FRIENDS] = function () {
+  // TODO 获取好友列表
+}
+
+
+export default store

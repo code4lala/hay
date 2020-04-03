@@ -19,15 +19,30 @@ const cet = function (arg: any) {
 }
 const cer = console.error
 
+// 连接 mongodb
+const MongoClient = require('mongodb').MongoClient
+const MONGODB_URL = 'mongodb://localhost'
+let dbo: any = null
+MongoClient.connect(MONGODB_URL,
+  {useNewUrlParser: true, useUnifiedTopology: true},
+  function (err: any, mongodb: any) {
+    if (err) throw err
+    dbo = mongodb.db('hay')
+    clt('MongoDB数据库连接成功')
+  })
+
+
 // 以下是客户端服务端公共部分 {{{
 
 enum MSG_BACK_TYPE {
   LOGIN_SUCC,
   LOGIN_FAIL,
+  GOT_FRIENDS,
 }
 
 enum MSG_TYPE {
   LOGIN,
+  GET_FRIENDS,
   CHAT,
 }
 
@@ -35,16 +50,35 @@ enum MSG_TYPE {
 
 let MSG_HANDLER: any = []
 MSG_HANDLER[MSG_TYPE.LOGIN] = function (conn: any, data: string) {
-  clt('登录消息处理器')
-  // TODO 判断用户名密码啥的对不对
-  conn.sendUTF(JSON.stringify({
-    type: MSG_BACK_TYPE.LOGIN_SUCC,
-    data: '登录成功'
-  }))
+  clt('登录处理器')
+  dbo.collection('user').find({
+    name: data
+  }).toArray(function (err: any, result: Array<any>) {
+    if (err) throw err
+    cl(result)
+    if (result.length >= 1) {
+      clt('查询有该用户，登录成功')
+      conn.sendUTF(JSON.stringify({
+        type: MSG_BACK_TYPE.LOGIN_SUCC,
+        data: data
+      }))
+    } else {
+      clt('用户不存在，登录失败')
+      conn.sendUTF(JSON.stringify({
+        type: MSG_BACK_TYPE.LOGIN_FAIL,
+        data: data
+      }))
+    }
+  })
 }
 MSG_HANDLER[MSG_TYPE.CHAT] = function (conn: any, data: string) {
-  clt('聊天内容消息处理器')
+  clt('获取聊天消息处理器')
   cl(data)
+}
+MSG_HANDLER[MSG_TYPE.GET_FRIENDS] = function (conn: any, data: string) {
+  clt('获取好友处理器')
+  cl(data)
+  // TODO 获取好友列表
 }
 
 // HTTP server
@@ -79,42 +113,18 @@ function wsServerOnRequest(request: any) {
   // 用户发送消息
   connection.on('message', function (message: any) {
     if (message.type !== 'utf8') return
-    if (userName === '') {
-      // 记住用户名
-      let msgObj
-      try {
-        msgObj = JSON.parse(message.utf8Data)
-      } catch (e) {
-        cer(e)
-        cet('解析客户端发来的消息时候出错啦')
-      }
+    // 记住用户名
+    let msgObj
+    try {
+      msgObj = JSON.parse(message.utf8Data)
+      clt('客户端发来的msgObj如下')
       cl(msgObj)
-      MSG_HANDLER[msgObj.type](connection, msgObj.data)
-      connection.sendUTF(JSON.stringify({
-        type: 'name_set',
-        data: userName
-      }))
-
-      clt('User is known as: ' + userName)
-    } else {
-      // 登录并广播
-      clt('Received message from '
-        + userName + ': ' + message.utf8Data)
-
-      // 保存所有已发送消息
-      const msgObj = {
-        time: (new Date()).getTime(),
-        text: message.utf8Data,
-        author: userName,
-      }
-      chatHistory.push(msgObj)
-
-      // 向所有已登录客户端广播消息
-      const json = JSON.stringify({type: 'message', data: msgObj})
-      for (let i = 0; i < clients.length; i++) {
-        clients[i].sendUTF(json)
-      }
+    } catch (e) {
+      cer(e)
+      cet('解析客户端发来的消息时候出错啦')
+      return
     }
+    MSG_HANDLER[msgObj.type](connection, msgObj.data)
   })
 
   // 用户断开连接
