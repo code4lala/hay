@@ -1,68 +1,52 @@
 <template>
   <div style='margin: 10px'>
-
-    <header>
-      <div class="row">
-        <div class="col-sm-3 col-md-6 col-lg-4 col-xl-2 bg-info">
+    <el-container>
+      <el-container>
+        <el-aside width="200px">
           Hay! {{ $store.state.userName }}
-        </div>
-        <div class="col-sm-9 col-md-6 col-lg-8 col-xl-10 bg-warning">
-          How are you!
-        </div>
-      </div>
-    </header>
-
-    <main role="main">
-      <div class="row">
-        <div class="col-sm-3 col-md-6 col-lg-4 col-xl-2 bg-success">
           <FriendList>
           </FriendList>
-        </div>
-        <div class="col-sm-9 col-md-6 col-lg-8 col-xl-10">
-          <HistoryMsgList>
-          </HistoryMsgList>
-          <BaseInputText
-              v-model='strMsgToBeSend'
-              input-id="input_name_msg_to_be_sent"
-              input-placeholder='在此输入要发送的消息...'
-              v-on:keydown.enter='fnSendMsg'></BaseInputText>
-        </div>
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="row">
-        <div class="col-sm-3 col-md-6 col-lg-4 col-xl-2 bg-info">
-          底部左侧
-        </div>
-        <div class="col-sm-9 col-md-6 col-lg-8 col-xl-10 bg-warning">
-          底部右侧
-        </div>
-      </div>
-    </footer>
-
+        </el-aside>
+        <el-container>
+          <el-main>
+            <HistoryMsgList>
+            </HistoryMsgList>
+          </el-main>
+          <el-footer>
+            <BaseInputText
+                v-model='strMsgToBeSend'
+                input-id="input_name_msg_to_be_sent"
+                input-placeholder='在此输入要发送的消息...'
+                v-on:keydown.enter='fnSendMsg'></BaseInputText>
+          </el-footer>
+        </el-container>
+      </el-container>
+    </el-container>
   </div>
-
 </template>
 
-<script lang='ts'>
-  import {Component, Prop, Vue} from 'vue-property-decorator'
-  import BaseInputText from "@/components/base/BaseInputText.vue"
+<script lang='js'>
+  import BaseInputText from '@/components/base/BaseInputText.vue'
   import HistoryMsgList from '@/components/chat_ui/HistoryMsgList.vue'
-  import FriendList from "@/components/chat_ui/FriendList.vue";
+  import FriendList from '@/components/chat_ui/FriendList.vue';
 
-  @Component({
+  export default {
+    name: 'Chat',
+    data: function () {
+      return {
+        strMsgToBeSend: ''
+      }
+    },
+    methods: {
+      fnSendMsg() {
+
+        console.log('此处发送消息: ' + this.strMsgToBeSend)
+      }
+    },
     components: {
       FriendList,
       HistoryMsgList,
       BaseInputText
-    }
-  })
-  export default class Chat extends Vue {
-    private strMsgToBeSend = ''
-
-    fnSendMsg() {
-      console.log('此处发送消息: ' + this.strMsgToBeSend)
     }
   }
 </script>

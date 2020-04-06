@@ -1,7 +1,5 @@
 import Vue from "vue";
 import Vuex from "vuex";
-
-import Global from "@/store/global";
 import router from "@/router";
 
 Vue.use(Vuex);
@@ -36,10 +34,12 @@ function fnBuildMsg(type: MSG_TYPE, content: string): string {
 }
 
 const store = new Vuex.Store<any>({
-  state: function () {
+  state() {
     return {
+      connection: null,
       userName: '',
-      arrayFriendItems: []
+      arrayFriendItems: [],
+      arrayHistoryMsgItems: []
     }
   },
   mutations: {
@@ -47,24 +47,24 @@ const store = new Vuex.Store<any>({
       cl('init websocket...')
 
       // 开启连接
-      Global.connection = new WebSocket('ws://127.0.0.1:10086')
+      store.state.connection = new WebSocket('ws://127.0.0.1:10086')
 
       // 处理三个函数 onopen onerror onmessage
 
-      Global.connection.onopen = function (event: any) {
+      store.state.connection.onopen = function (event: any) {
         // 连接已就绪 TODO
         cl('成功连接到服务器')
         cl(event.target.url)
       }
 
-      Global.connection.onerror = function (event: Event) {
+      store.state.connection.onerror = function (event: Event) {
         // 发送/接收数据时失败 TODO
         ce('发送或接收数据时发生错误如下:')
         ce(event)
       }
 
       // 处理服务器发来的消息
-      Global.connection.onmessage = function (messageEvent: MessageEvent) {
+      store.state.connection.onmessage = function (messageEvent: MessageEvent) {
         // 处理消息 TODO
         let msgObj = null
         try {
@@ -83,14 +83,14 @@ const store = new Vuex.Store<any>({
     },
 
     fnSendByConnection: function (state: any, msg: any) {
-      Global.connection.send(msg)
+      store.state.connection.send(msg)
       cl('已发送如下消息至服务端')
       cl(msg)
     },
 
     fnLoginByConnection: function (state: any, userName: string) {
       cl('登录用户名为' + userName)
-      Global.connection.send(fnBuildMsg(MSG_TYPE.LOGIN, userName))
+      store.state.connection.send(fnBuildMsg(MSG_TYPE.LOGIN, userName))
       cl('正在登录')
     }
   },
@@ -125,6 +125,7 @@ MSG_HANDLER[MSG_BACK_TYPE.GOT_FRIENDS] = function (data: any) {
     })
   }
   cl('组合的好友列表如下')
+  cl(friendsItem)
   store.state.arrayFriendItems = friendsItem
 }
 
