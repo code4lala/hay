@@ -19,6 +19,16 @@ db.user.find()
 // 新增几个好友关系
 db.createCollection('friend_list')
 db.friend_list.insert([{
+    a: '小美丽',
+    b: '小美丽'
+}, {
+    a: '小可爱',
+    b: '小可爱'
+}, {
+    a: '小漂亮',
+    b: '小漂亮'
+// 前三个自己跟自己是好友
+}, {
     a: '小可爱',
     b: '小美丽'
 }, {

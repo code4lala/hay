@@ -38,12 +38,14 @@ enum MSG_BACK_TYPE {
   LOGIN_SUCC,
   LOGIN_FAIL,
   GOT_FRIENDS,
+  GOT_CHAT_HISTORY,
 }
 
 enum MSG_TYPE {
   LOGIN,
   GET_FRIENDS,
-  CHAT,
+  SEND_CHAT_CONTENT,
+  GET_CHAT_HISTORY,
 }
 
 // 以上是客户端服务端公共部分 }}}
@@ -71,9 +73,20 @@ MSG_HANDLER[MSG_TYPE.LOGIN] = function (conn: any, data: string) {
     }
   })
 }
-MSG_HANDLER[MSG_TYPE.CHAT] = function (conn: any, data: string) {
-  clt('获取聊天消息处理器')
+MSG_HANDLER[MSG_TYPE.SEND_CHAT_CONTENT] = function (conn: any, data: any) {
+  clt('发送聊天消息处理器')
   cl(data)
+}
+MSG_HANDLER[MSG_TYPE.GET_CHAT_HISTORY] = function (conn: any, data: string) {
+  clt('获取聊天记录处理器')
+  cl(data)
+  /*
+
+        [
+          {user: '李四', msg: '哈哈哈', time: new Date(), id: 1},
+          {user: '王五', msg: '嘻嘻嘻', time: new Date(), id: 2}
+        ]
+   */
 }
 MSG_HANDLER[MSG_TYPE.GET_FRIENDS] = function (conn: any, data: string) {
   clt('获取好友处理器')

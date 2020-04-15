@@ -13,12 +13,14 @@ enum MSG_BACK_TYPE {
   LOGIN_SUCC,
   LOGIN_FAIL,
   GOT_FRIENDS,
+  GOT_CHAT_HISTORY,
 }
 
 enum MSG_TYPE {
   LOGIN,
   GET_FRIENDS,
-  CHAT,
+  SEND_CHAT_CONTENT,
+  GET_CHAT_HISTORY,
 }
 
 // 以上是客户端服务端公共部分 }}}
@@ -26,20 +28,21 @@ enum MSG_TYPE {
 
 const MSG_HANDLER: any = []
 
-function fnBuildMsg(type: MSG_TYPE, content: string): string {
+function fnBuildMsg(type: MSG_TYPE, content: any): string {
   return JSON.stringify({
     type: type,
     data: content
   })
 }
 
-const store = new Vuex.Store<any>({
+const store = new Vuex.Store({
   state() {
     return {
       connection: null,
       userName: '',
       arrayFriendItems: [],
-      arrayHistoryMsgItems: []
+      arrayHistoryMsgItems: [],
+      strCurrentChatPartner: ''
     }
   },
   mutations: {
@@ -82,16 +85,32 @@ const store = new Vuex.Store<any>({
       }
     },
 
-    fnSendByConnection: function (state: any, msg: any) {
-      store.state.connection.send(msg)
-      cl('已发送如下消息至服务端')
-      cl(msg)
+    fnSendMsgContentByConnection: function (state: any, content: any) {
+      store.state.connection.send(fnBuildMsg(MSG_TYPE.SEND_CHAT_CONTENT,
+        {
+          sender: store.state.userName,
+          receiver: store.state.strCurrentChatPartner,
+          timestamp: Date.now(),
+          msg: content
+        }
+      ))
+      cl('发送消息完成')
     },
 
     fnLoginByConnection: function (state: any, userName: string) {
       cl('登录用户名为' + userName)
       store.state.connection.send(fnBuildMsg(MSG_TYPE.LOGIN, userName))
       cl('正在登录')
+    },
+
+    fnGetHistoryMsgByConnection: function (state: any, userName: string) {
+      cl('获取和' + userName + '的聊天记录')
+      store.state.connection.send(fnBuildMsg(MSG_TYPE.GET_CHAT_HISTORY, userName))
+    },
+
+    fnGetFriendsByConnection: function (state: any, userName: string) {
+      cl('获取' + userName + '的好友列表')
+      store.state.connection.send(fnBuildMsg(MSG_TYPE.GET_FRIENDS, userName))
     }
   },
   actions: {},
@@ -103,10 +122,9 @@ MSG_HANDLER[MSG_BACK_TYPE.LOGIN_SUCC] = function (data: string) {
   cl('服务端返回的消息为: ' + data)
   router.push('/')
   store.state.userName = data
-  store.commit('fnSendByConnection', fnBuildMsg(
-    MSG_TYPE.GET_FRIENDS,
-    store.state.userName
-  ))
+  store.state.strCurrentChatPartner = data
+  store.commit('fnGetFriendsByConnection', data)
+  store.commit('fnGetHistoryMsgByConnection', data)
   cl('已重定向到聊天界面')
 }
 MSG_HANDLER[MSG_BACK_TYPE.LOGIN_FAIL] = function (data: string) {

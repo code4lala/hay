@@ -11,7 +11,7 @@
 </template>
 
 <script lang='ts'>
-  import {Component, Prop, Vue} from 'vue-property-decorator'
+  import {Component, Vue} from 'vue-property-decorator'
   import Chat from "@/components/Chat.vue";
   import Setting from "@/components/Setting.vue";
 

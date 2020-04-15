@@ -1,23 +1,28 @@
 <template>
   <ul>
     <FriendItem
-        v-for='friendItem in store.state.arrayFriendItems'
+        v-for='friendItem in arrayFriendItems'
         v-bind:key='friendItem.name'
-        v-bind:strFriendName='friendItem.name'>
+        v-bind:strFriendName='friendItem.name'
+        v-bind:selectedFriend='selectedFriend'>
     </FriendItem>
   </ul>
 </template>
 
 <script>
   import FriendItem from '@/components/chat_ui/FriendItem';
-  import store from '@/store';
 
   export default {
     name: 'FriendList',
     components: {FriendItem},
-    data: function () {
-      return {
-        store
+    props: {
+      arrayFriendItems: {
+        type: Array,
+        required: true
+      },
+      selectedFriend: {
+        type: String,
+        required: true
       }
     }
   }
