@@ -15,6 +15,7 @@ enum MSG_BACK_TYPE {
   GOT_FRIENDS, // 获取好友列表成功
   GOT_CHAT_HISTORY, // 获取聊天记录成功
   GOT_MSG, // 发送消息成功
+  GOT_NEW_MSG, // 新消息到达
 }
 
 enum MSG_TYPE {
@@ -160,6 +161,15 @@ MSG_HANDLER[MSG_BACK_TYPE.GOT_MSG] = function (data: any) {
   cl('消息发送成功，刷新聊天记录窗口')
   cl(data)
   store.commit('fnGetHistoryMsgByConnection')
+}
+MSG_HANDLER[MSG_BACK_TYPE.GOT_NEW_MSG] = function (data: any) {
+  // TODO 新消息到达
+  cl('新消息到达啦')
+  cl(data)
+  // 如果正在和该对象聊天 直接刷新聊天记录
+  if (store.state.strCurrentChatPartner === data.sender) {
+    store.commit('fnGetHistoryMsgByConnection')
+  }
 }
 
 

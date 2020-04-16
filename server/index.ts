@@ -5,7 +5,6 @@ const webSocketServerPort = 10086
 const webSocketServer = require('websocket').server
 const http = require('http')
 
-let chatHistory: any = []
 let clients: any = []
 
 // clt = console log time       cl = console log
@@ -53,7 +52,7 @@ enum MSG_TYPE {
 // 以上是客户端服务端公共部分 }}}
 
 let MSG_HANDLER: any = []
-MSG_HANDLER[MSG_TYPE.LOGIN] = function (conn: any, data: string) {
+MSG_HANDLER[MSG_TYPE.LOGIN] = function (conn: any, data: string, index: any) {
   clt('登录处理器')
   dbo.collection('user').find({
     name: data
@@ -66,6 +65,9 @@ MSG_HANDLER[MSG_TYPE.LOGIN] = function (conn: any, data: string) {
         type: MSG_BACK_TYPE.LOGIN_SUCC,
         data: data
       }))
+      // 服务端设置该登录成功用户的ID
+      clients[index].id = data
+      clt('当前有' + clients.length + '个已连接用户')
     } else {
       clt('用户不存在，登录失败')
       conn.sendUTF(JSON.stringify({
@@ -87,6 +89,24 @@ MSG_HANDLER[MSG_TYPE.SEND_CHAT_CONTENT] = function (conn: any, data: any) {
       data: data
     }))
     // 提醒对方有新消息到达 TODO 如何给指定客户端发消息
+    // 查找对方是否在线
+    clt('当前有' + clients.length + '个已连接用户')
+    for (let i = 0; i < clients.length; i++) {
+      // TODO 把是否为null去掉
+      if (clients[i] === null) continue
+      if (clients[i].id === data.receiver) {
+        clt('聊天对象' + data.receiver + '在线')
+        clients[i].conn.sendUTF(JSON.stringify({
+          type: MSG_BACK_TYPE.GOT_NEW_MSG,
+          data: data
+        }))
+        clt('已通知对方有新消息')
+        return // TODO 改成break
+      }
+    }
+    // TODO 删掉debug
+    clt('聊天对象' + data.receiver + '不在线')
+    cl(clients)
   })
 }
 MSG_HANDLER[MSG_TYPE.GET_CHAT_HISTORY] = function (conn: any, data: any) {
@@ -150,17 +170,13 @@ function wsServerOnRequest(request: any) {
 
   // 接受连接
   const connection = request.accept(null, request.origin)
-  const index = clients.push(connection) - 1
-  let userName = ''
+  const index = clients.push({
+    conn: connection,
+    id: ''
+  }) - 1
+  clt('当前有' + clients.length + '个已连接用户')
 
-  clt('Connection accepted')
-
-  // 返回历史消息
-  if (chatHistory.length > 0) {
-    connection.sendUTF(
-      JSON.stringify({type: 'history', data: chatHistory})
-    )
-  }
+  clt('已接受和' + connection.remoteAddress + '的连接')
 
   // 用户发送消息
   connection.on('message', function (message: any) {
@@ -175,24 +191,24 @@ function wsServerOnRequest(request: any) {
       cet('解析客户端发来的消息时候出错啦')
       return
     }
-    MSG_HANDLER[msgObj.type](connection, msgObj.data)
+    MSG_HANDLER[msgObj.type](connection, msgObj.data, index)
   })
 
   // 用户断开连接
   connection.on('close', function (connection: any) {
-    if (userName !== '') {
-      clt('Peer '
-        + connection.remoteAddress + ' disconnected')
+    clt('用户断开连接')
 
-      // 从已连接列表中移除该客户端
-      clients.splice(index, 1)
-    }
+    // TODO 从已连接列表中移除该客户端 当前做法是直接置空，但是留了个空位
+    // clients.splice(index, 1)
+    clients[index] = null
+    clt('当前有' + clients.length + '个已连接用户')
   })
 
   connection.on('error', function (error: any) {
     if (error.code === 'ECONNRESET') {
       clt('用户离线')
-      // TODO
+      // TODO 用户离线之后服务端做什么？
+      // 这个被调用之后会调用到 on close
     } else {
       clt('连接出错: ')
       clt(error)
@@ -202,5 +218,3 @@ function wsServerOnRequest(request: any) {
 
 // 连接回调函数
 wsServer.on('request', wsServerOnRequest)
-
-clt('last line')

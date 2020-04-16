@@ -19,12 +19,6 @@
         type: Array,
         required: true
       },
-    },
-    methods: {
-      appendOneMsg: function () {
-        // TODO 新增消息
-        console.log('TODO 这里新增消息')
-      }
     }
   }
 </script>
