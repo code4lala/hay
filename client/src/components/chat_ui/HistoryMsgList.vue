@@ -2,11 +2,8 @@
   <ul>
     <HistoryMsgItem
         v-for='msgItem in arrayHistoryMsgItems'
-        v-bind:key='msgItem.id'
-        v-bind:strUserName='msgItem.user'
-        v-bind:strMsg='msgItem.msg'
-        v-bind:dateTime='msgItem.time'
-    >
+        v-bind:key='msgItem._id'
+        v-bind:msgItem='msgItem'>
     </HistoryMsgItem>
   </ul>
 </template>

@@ -10,17 +10,18 @@ const ce = console.error
 // 以下是客户端服务端公共部分 {{{
 
 enum MSG_BACK_TYPE {
-  LOGIN_SUCC,
-  LOGIN_FAIL,
-  GOT_FRIENDS,
-  GOT_CHAT_HISTORY,
+  LOGIN_SUCC, // 登录成功
+  LOGIN_FAIL, // 登录失败
+  GOT_FRIENDS, // 获取好友列表成功
+  GOT_CHAT_HISTORY, // 获取聊天记录成功
+  GOT_MSG, // 发送消息成功
 }
 
 enum MSG_TYPE {
-  LOGIN,
-  GET_FRIENDS,
-  SEND_CHAT_CONTENT,
-  GET_CHAT_HISTORY,
+  LOGIN, // 请求登录
+  GET_FRIENDS, // 请求好友列表
+  SEND_CHAT_CONTENT, // 请求发送消息
+  GET_CHAT_HISTORY, // 请求聊天记录
 }
 
 // 以上是客户端服务端公共部分 }}}
@@ -103,14 +104,18 @@ const store = new Vuex.Store({
       cl('正在登录')
     },
 
-    fnGetHistoryMsgByConnection: function (state: any, userName: string) {
-      cl('获取和' + userName + '的聊天记录')
-      store.state.connection.send(fnBuildMsg(MSG_TYPE.GET_CHAT_HISTORY, userName))
+    fnGetHistoryMsgByConnection: function () {
+      const userName = store.state.strCurrentChatPartner
+      cl('获取' + store.state.userName + '和' + userName + '的聊天记录')
+      store.state.connection.send(fnBuildMsg(MSG_TYPE.GET_CHAT_HISTORY, {
+        requester: store.state.userName,
+        partner: userName
+      }))
     },
 
-    fnGetFriendsByConnection: function (state: any, userName: string) {
-      cl('获取' + userName + '的好友列表')
-      store.state.connection.send(fnBuildMsg(MSG_TYPE.GET_FRIENDS, userName))
+    fnGetFriendsByConnection: function () {
+      cl('获取' + store.state.userName + '的好友列表')
+      store.state.connection.send(fnBuildMsg(MSG_TYPE.GET_FRIENDS, store.state.userName))
     }
   },
   actions: {},
@@ -124,7 +129,7 @@ MSG_HANDLER[MSG_BACK_TYPE.LOGIN_SUCC] = function (data: string) {
   store.state.userName = data
   store.state.strCurrentChatPartner = data
   store.commit('fnGetFriendsByConnection', data)
-  store.commit('fnGetHistoryMsgByConnection', data)
+  store.commit('fnGetHistoryMsgByConnection')
   cl('已重定向到聊天界面')
 }
 MSG_HANDLER[MSG_BACK_TYPE.LOGIN_FAIL] = function (data: string) {
@@ -145,6 +150,16 @@ MSG_HANDLER[MSG_BACK_TYPE.GOT_FRIENDS] = function (data: any) {
   cl('组合的好友列表如下')
   cl(friendsItem)
   store.state.arrayFriendItems = friendsItem
+}
+MSG_HANDLER[MSG_BACK_TYPE.GOT_CHAT_HISTORY] = function (data: any) {
+  cl('获取到聊天记录啦')
+  cl(data)
+  store.state.arrayHistoryMsgItems = data
+}
+MSG_HANDLER[MSG_BACK_TYPE.GOT_MSG] = function (data: any) {
+  cl('消息发送成功，刷新聊天记录窗口')
+  cl(data)
+  store.commit('fnGetHistoryMsgByConnection')
 }
 
 

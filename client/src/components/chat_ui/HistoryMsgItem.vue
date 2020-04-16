@@ -1,6 +1,6 @@
 <template>
   <li>
-    {{strUserName}} @ {{dateTime}} : {{strMsg}}
+    {{msgItem.sender}} @ {{new Date(msgItem.timestamp).toLocaleString()}} : {{msgItem.msg}}
   </li>
 </template>
 
@@ -8,16 +8,7 @@
   export default {
     name: 'HistoryMsgItem',
     props: {
-      strUserName: {
-        type: String,
-        required: true
-      },
-      strMsg: {
-        type: String,
-        required: true
-      },
-      dateTime: {
-        type: Date,
+      msgItem: {
         required: true
       }
     }

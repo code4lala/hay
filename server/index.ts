@@ -35,17 +35,19 @@ MongoClient.connect(MONGODB_URL,
 // 以下是客户端服务端公共部分 {{{
 
 enum MSG_BACK_TYPE {
-  LOGIN_SUCC,
-  LOGIN_FAIL,
-  GOT_FRIENDS,
-  GOT_CHAT_HISTORY,
+  LOGIN_SUCC, // 登录成功
+  LOGIN_FAIL, // 登录失败
+  GOT_FRIENDS, // 获取好友列表成功
+  GOT_CHAT_HISTORY, // 获取聊天记录成功
+  GOT_MSG, // 发送消息成功
+  GOT_NEW_MSG, // 新消息到达
 }
 
 enum MSG_TYPE {
-  LOGIN,
-  GET_FRIENDS,
-  SEND_CHAT_CONTENT,
-  GET_CHAT_HISTORY,
+  LOGIN, // 请求登录
+  GET_FRIENDS, // 请求好友列表
+  SEND_CHAT_CONTENT, // 请求发送消息
+  GET_CHAT_HISTORY, // 请求聊天记录
 }
 
 // 以上是客户端服务端公共部分 }}}
@@ -76,17 +78,45 @@ MSG_HANDLER[MSG_TYPE.LOGIN] = function (conn: any, data: string) {
 MSG_HANDLER[MSG_TYPE.SEND_CHAT_CONTENT] = function (conn: any, data: any) {
   clt('发送聊天消息处理器')
   cl(data)
+  dbo.collection('chat_history').insertOne(data, function (err: any) {
+    if (err) throw err
+    clt('聊天记录保存到数据库成功')
+    // 返回发送消息成功的信息
+    conn.sendUTF(JSON.stringify({
+      type: MSG_BACK_TYPE.GOT_MSG,
+      data: data
+    }))
+    // 提醒对方有新消息到达 TODO 如何给指定客户端发消息
+  })
 }
-MSG_HANDLER[MSG_TYPE.GET_CHAT_HISTORY] = function (conn: any, data: string) {
+MSG_HANDLER[MSG_TYPE.GET_CHAT_HISTORY] = function (conn: any, data: any) {
   clt('获取聊天记录处理器')
   cl(data)
-  /*
-
-        [
-          {user: '李四', msg: '哈哈哈', time: new Date(), id: 1},
-          {user: '王五', msg: '嘻嘻嘻', time: new Date(), id: 2}
-        ]
-   */
+  dbo.collection('chat_history').find({
+    $or: [
+      {
+        sender: data.partner,
+        receiver: data.requester
+      },
+      {
+        sender: data.requester,
+        receiver: data.partner
+      }
+    ]
+  }).sort({
+    // 按时间顺序排列
+    timestamp: 1
+  }).toArray(function (err: any, res: any) {
+    if (err) throw err
+    clt('查询到' + data.requester + '和' + data.partner + '有'
+      + res.length + '条聊天记录')
+    cl(res)
+    // 返回查询到的聊天记录
+    conn.sendUTF(JSON.stringify({
+      type: MSG_BACK_TYPE.GOT_CHAT_HISTORY,
+      data: res
+    }))
+  })
 }
 MSG_HANDLER[MSG_TYPE.GET_FRIENDS] = function (conn: any, data: string) {
   clt('获取好友处理器')

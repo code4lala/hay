@@ -29,7 +29,7 @@
     methods: {
       fnChangeChatPartner: function (strChatPartner) {
         store.state.strCurrentChatPartner = strChatPartner
-        store.commit('fnGetHistoryMsgByConnection', strChatPartner)
+        store.commit('fnGetHistoryMsgByConnection')
       }
     }
   }

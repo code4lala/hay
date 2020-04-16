@@ -27,7 +27,7 @@ db.friend_list.insert([{
 }, {
     a: '小漂亮',
     b: '小漂亮'
-// 前三个自己跟自己是好友
+    // 前三个自己跟自己是好友
 }, {
     a: '小可爱',
     b: '小美丽'
@@ -42,3 +42,7 @@ db.friend_list.insert([{
     b: '小可爱'
 }])
 db.friend_list.find()
+
+// 新增聊天记录表格
+db.createCollection('chat_history')
+db.chat_history.find()
