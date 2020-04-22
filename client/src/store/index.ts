@@ -1,32 +1,13 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import router from "@/router";
+import MSG_BACK_TYPE from "../../../public/MSG_BACK_TYPE"
+import MSG_TYPE from "../../../public/MSG_TYPE"
 
 Vue.use(Vuex);
 
 const cl = console.log
 const ce = console.error
-
-// 以下是客户端服务端公共部分 {{{
-
-enum MSG_BACK_TYPE {
-  LOGIN_SUCC, // 登录成功
-  LOGIN_FAIL, // 登录失败
-  GOT_FRIENDS, // 获取好友列表成功
-  GOT_CHAT_HISTORY, // 获取聊天记录成功
-  GOT_MSG, // 发送消息成功
-  GOT_NEW_MSG, // 新消息到达
-}
-
-enum MSG_TYPE {
-  LOGIN, // 请求登录
-  GET_FRIENDS, // 请求好友列表
-  SEND_CHAT_CONTENT, // 请求发送消息
-  GET_CHAT_HISTORY, // 请求聊天记录
-}
-
-// 以上是客户端服务端公共部分 }}}
-
 
 const MSG_HANDLER: any = []
 

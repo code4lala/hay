@@ -31,10 +31,10 @@
   </div>
 </template>
 
-<script lang='js'>
+<script>
   import HistoryMsgList from '@/components/chat_ui/HistoryMsgList.vue'
-  import FriendList from '@/components/chat_ui/FriendList.vue';
-  import store from '@/store';
+  import FriendList from '@/components/chat_ui/FriendList.vue'
+  import store from '@/store'
 
   export default {
     name: 'Chat',
