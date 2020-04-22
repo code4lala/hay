@@ -8,6 +8,9 @@
       v-on:click='fnChangeChatPartner(strFriendName)'
   >
     {{ strFriendName }}
+    <span v-if='intNewMsgCount>0'>
+      ::: {{ intNewMsgCount }}
+    </span>
   </li>
 </template>
 
@@ -24,11 +27,19 @@
       selectedFriend: {
         type: String,
         required: true
+      },
+      intNewMsgCount: {
+        type: Number,
+        default: 0,
+        required: true
       }
     },
     methods: {
       fnChangeChatPartner: function (strChatPartner) {
         store.state.strCurrentChatPartner = strChatPartner
+        store.state.arrayFriendItems.find(function (el) {
+          return el.name === strChatPartner
+        }).intNewMsgCount = 0
         store.commit('fnGetHistoryMsgByConnection')
       }
     }

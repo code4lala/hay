@@ -38,14 +38,12 @@ function fnBuildMsg(type: MSG_TYPE, content: any): string {
 }
 
 const store = new Vuex.Store({
-  state() {
-    return {
-      connection: null,
-      userName: '',
-      arrayFriendItems: [],
-      arrayHistoryMsgItems: [],
-      strCurrentChatPartner: ''
-    }
+  state: {
+    connection: null,
+    userName: '',
+    arrayFriendItems: [],
+    arrayHistoryMsgItems: [],
+    strCurrentChatPartner: ''
   },
   mutations: {
     fnInitConnection() {
@@ -145,7 +143,8 @@ MSG_HANDLER[MSG_BACK_TYPE.GOT_FRIENDS] = function (data: any) {
   const friendsItem: any = []
   for (let i = 0; i < data.length; i++) {
     friendsItem.push({
-      name: data[i].b
+      name: data[i].b,
+      intNewMsgCount: 0
     })
   }
   cl('组合的好友列表如下')
@@ -169,6 +168,13 @@ MSG_HANDLER[MSG_BACK_TYPE.GOT_NEW_MSG] = function (data: any) {
   // 如果正在和该对象聊天 直接刷新聊天记录
   if (store.state.strCurrentChatPartner === data.sender) {
     store.commit('fnGetHistoryMsgByConnection')
+  } else {
+    cl('别的聊天对象发来新消息啦')
+    const tmp = store.state.arrayFriendItems.find(function (el: any) {
+      return el.name === data.sender
+    })
+    cl(tmp)
+    tmp.intNewMsgCount++
   }
 }
 

@@ -46,3 +46,4 @@ db.friend_list.find()
 // 新增聊天记录表格
 db.createCollection('chat_history')
 db.chat_history.find()
+

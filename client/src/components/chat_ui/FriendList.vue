@@ -4,7 +4,8 @@
         v-for='friendItem in arrayFriendItems'
         v-bind:key='friendItem.name'
         v-bind:strFriendName='friendItem.name'
-        v-bind:selectedFriend='selectedFriend'>
+        v-bind:selectedFriend='selectedFriend'
+        v-bind:intNewMsgCount='friendItem.intNewMsgCount'>
     </FriendItem>
   </ul>
 </template>
