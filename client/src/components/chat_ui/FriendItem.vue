@@ -1,16 +1,18 @@
 <template>
-  <b-list-group-item
+  <b-button
+      variant='light'
       class='d-flex align-items-center'
       v-on:click='fnChangeChatPartner(strFriendName)'
-      v-bind:class="{'friend-selected':strFriendName===selectedFriend,'friend-not-selected':strFriendName!==selectedFriend}"
+      v-bind:class="{'friend-selected':strFriendName===selectedFriend}"
   >
     <b-avatar
         v-bind:text='strFriendName.substring(strFriendName.length-2)'
         class='mr-3'
+        v-bind:badge='intNewMsgCount>0?intNewMsgCount+"":false'
+        badge-variant='light'
     ></b-avatar>
     <span class='mr-auto'> {{strFriendName}} </span>
-    <b-badge v-if='intNewMsgCount>0'>{{intNewMsgCount}}</b-badge>
-  </b-list-group-item>
+  </b-button>
 </template>
 
 <script>
@@ -47,9 +49,6 @@
 
 <style scoped>
   .friend-selected {
-    background-color: #BCBCBD;
-  }
-  .friend-not-selected {
-    background-color: #E7E6E5;
+    background-color: #E2E6EA;
   }
 </style>

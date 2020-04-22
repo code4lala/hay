@@ -1,5 +1,5 @@
 <template>
-  <b-list-group>
+  <b-button-group vertical>
     <FriendItem
         v-for='friendItem in arrayFriendItems'
         v-bind:key='friendItem.name'
@@ -7,7 +7,7 @@
         v-bind:selectedFriend='selectedFriend'
         v-bind:intNewMsgCount='friendItem.intNewMsgCount'>
     </FriendItem>
-  </b-list-group>
+  </b-button-group>
 </template>
 
 <script>

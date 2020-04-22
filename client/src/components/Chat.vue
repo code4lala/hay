@@ -15,6 +15,25 @@
             </HistoryMsgList>
           </el-main>
           <el-footer style='height: 250px'>
+            <b-button-group>
+              <!-- see https://bootstrap-vue.js.org/docs/icons choose icons -->
+              <b-button variant='light'>
+                <b-avatar icon='image' variant="light"></b-avatar>
+                图片
+              </b-button>
+              <b-button variant='light'>
+                <b-avatar icon='file-earmark' variant="light"></b-avatar>
+                文件
+              </b-button>
+              <b-button variant='light'>
+                <b-avatar icon='soundwave' variant="light"></b-avatar>
+                语音
+              </b-button>
+              <b-button variant='light'>
+                <b-avatar icon='camera-video' variant="light"></b-avatar>
+                视频
+              </b-button>
+            </b-button-group>
             <el-input
                 type='textarea'
                 :autosize="{ minRows: 2, maxRows: 4}"
