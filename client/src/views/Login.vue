@@ -22,7 +22,6 @@
 <script lang='js'>
   import store from '@/store/index'
 
-
   export default {
     name: 'client-login',
     components: {},

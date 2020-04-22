@@ -2,20 +2,19 @@
   <div style='margin: 10px'>
     <el-container>
       <el-container>
-        <el-aside width="200px">
-          Hay! {{ $store.state.userName }}
+        <el-aside width="250px">
           <FriendList
               v-bind:array-friend-items='$store.state.arrayFriendItems'
               v-bind:selectedFriend='$store.state.strCurrentChatPartner'>
           </FriendList>
         </el-aside>
         <el-container>
-          <el-main>
+          <el-main style='height: 500px'>
             <HistoryMsgList
                 v-bind:arrayHistoryMsgItems='$store.state.arrayHistoryMsgItems'>
             </HistoryMsgList>
           </el-main>
-          <el-footer>
+          <el-footer style='height: 250px'>
             <el-input
                 type='textarea'
                 :autosize="{ minRows: 2, maxRows: 4}"

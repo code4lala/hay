@@ -1,17 +1,16 @@
 <template>
-  <li v-if='selectedFriend===strFriendName'
+  <b-list-group-item
+      class='d-flex align-items-center'
       v-on:click='fnChangeChatPartner(strFriendName)'
+      v-bind:class="{'friend-selected':strFriendName===selectedFriend,'friend-not-selected':strFriendName!==selectedFriend}"
   >
-    ::: {{ strFriendName }} :::
-  </li>
-  <li v-else
-      v-on:click='fnChangeChatPartner(strFriendName)'
-  >
-    {{ strFriendName }}
-    <span v-if='intNewMsgCount>0'>
-      ::: {{ intNewMsgCount }}
-    </span>
-  </li>
+    <b-avatar
+        v-bind:text='strFriendName.substring(strFriendName.length-2)'
+        class='mr-3'
+    ></b-avatar>
+    <span class='mr-auto'> {{strFriendName}} </span>
+    <b-badge v-if='intNewMsgCount>0'>{{intNewMsgCount}}</b-badge>
+  </b-list-group-item>
 </template>
 
 <script>
@@ -47,5 +46,10 @@
 </script>
 
 <style scoped>
-
+  .friend-selected {
+    background-color: #BCBCBD;
+  }
+  .friend-not-selected {
+    background-color: #E7E6E5;
+  }
 </style>

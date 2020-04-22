@@ -170,11 +170,10 @@ MSG_HANDLER[MSG_BACK_TYPE.GOT_NEW_MSG] = function (data: any) {
     store.commit('fnGetHistoryMsgByConnection')
   } else {
     cl('别的聊天对象发来新消息啦')
-    const tmp = store.state.arrayFriendItems.find(function (el: any) {
+    store.state.arrayFriendItems.find(function (el: any) {
       return el.name === data.sender
-    })
-    cl(tmp)
-    tmp.intNewMsgCount++
+    }).intNewMsgCount++
+    // TODO 新消息提醒
   }
 }
 

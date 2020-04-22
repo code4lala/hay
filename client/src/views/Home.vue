@@ -1,32 +1,29 @@
 <template>
-  <div>
-    <button v-for='it_tab in tabs' v-bind:key='it_tab'
-            v-on:click='currentTab=it_tab'>
-      {{ it_tab }}
-    </button>
-    <keep-alive>
-      <component v-bind:is='currentTabComponent'></component>
-    </keep-alive>
-  </div>
+  <b-container fluid="true">
+    <b-tabs content-class='mt-3'>
+      <keep-alive>
+        <b-tab title='消息' active>
+          <Chat></Chat>
+        </b-tab>
+      </keep-alive>
+      <keep-alive>
+        <b-tab title='设置'>
+          <Setting></Setting>
+        </b-tab>
+      </keep-alive>
+    </b-tabs>
+  </b-container>
 </template>
 
-<script lang='ts'>
-  import {Component, Vue} from 'vue-property-decorator'
-  import Chat from "@/components/Chat.vue";
-  import Setting from "@/components/Setting.vue";
+<script>
+  import Chat from '@/components/Chat.vue'
+  import Setting from '@/components/Setting.vue'
 
-  @Component({
+  export default {
+    name: 'Home',
     components: {
       Chat,
       Setting
-    }
-  })
-  export default class Home extends Vue {
-    currentTab = 'Chat'
-    tabs: Array<string> = ['Chat', 'Setting']
-
-    get currentTabComponent() {
-      return this.currentTab
     }
   }
 </script>
