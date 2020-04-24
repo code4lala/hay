@@ -33,6 +33,8 @@ const store = new Vuex.Store({
       // 开启连接
       store.state.connection = new WebSocket('ws://127.0.0.1:10086')
 
+      store.state.connection.binaryType = 'arraybuffer'
+
       // 处理三个函数 onopen onerror onmessage
 
       store.state.connection.onopen = function (event: any) {
@@ -96,6 +98,29 @@ const store = new Vuex.Store({
     fnGetFriendsByConnection: function () {
       cl('获取' + store.state.userName + '的好友列表')
       store.state.connection.send(fnBuildMsg(MSG_TYPE.GET_FRIENDS, store.state.userName))
+    },
+
+    fnSendImageByConnection: function (state: any, imageContent: File) {
+      cl('发送图片到服务器')
+      const reader = new FileReader()
+      reader.readAsArrayBuffer(imageContent)
+      reader.onload = function (evt) {
+        if (evt.target!.result instanceof ArrayBuffer) {
+          cl('二进制流图片')
+          cl(store.state.connection.binaryType)
+          cl(evt.target!.result)
+          const result = {
+            type: MSG_TYPE.SEND_IMAGE, data: {
+              sender: store.state.userName,
+              receiver: store.state.strCurrentChatPartner,
+              imageFile: evt.target!.result
+            }
+          }
+          cl(result)
+          cl('发送的是' + (new Uint8Array(evt.target!.result)).buffer)
+          store.state.connection.send((new Uint8Array(evt.target!.result)).buffer)
+        }
+      }
     }
   },
   actions: {},

@@ -20,7 +20,8 @@
     "element-ui": "^2.13.1",
     "jquery": "^3.5.0",
     "bootstrap": "^4.4.1",
-    "bootstrap-vue": "^2.12.0"
+    "bootstrap-vue": "^2.12.0",
+    "vue-picture-input": "^2.1.6"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.18.0",

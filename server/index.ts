@@ -3,8 +3,8 @@ import MSG_BACK_TYPE from "../public/MSG_BACK_TYPE"
 import MSG_TYPE from "../public/MSG_TYPE"
 
 process.title = 'how_are_you_server'
-const webSocketServerPort = 10086
-const webSocketServer = require('websocket').server
+const WEB_SOCKET_SERVER_PORT = 10086
+const WebSocketServer = require('websocket').server
 const http = require('http')
 
 let clients: any = []
@@ -18,7 +18,7 @@ const cl = console.log
 const cet = function (arg: any) {
   console.error((new Date()) + ' ' + arg)
 }
-const cer = console.error
+const ce = console.error
 
 // 连接 mongodb
 const MongoClient = require('mongodb').MongoClient
@@ -134,16 +134,21 @@ MSG_HANDLER[MSG_TYPE.GET_FRIENDS] = function (conn: any, data: string) {
     }))
   })
 }
+MSG_HANDLER[MSG_TYPE.SEND_IMAGE] = function (conn: any, data: any) {
+  clt('发送图片处理器')
+  cl(data)
+  cl(data.imageFile)
+}
 
 // HTTP server
 const server = http.createServer(function (request: IncomingMessage, response: ServerResponse) {
   clt('创建http server' + request + response)
 })
-server.listen(webSocketServerPort, function () {
-  clt('正在监听端口' + webSocketServerPort)
+server.listen(WEB_SOCKET_SERVER_PORT, function () {
+  clt('正在监听端口' + WEB_SOCKET_SERVER_PORT)
 })
 // WebSocket server
-const wsServer = new webSocketServer({
+const wsServer = new WebSocketServer({
   httpServer: server
 })
 
@@ -152,6 +157,7 @@ function wsServerOnRequest(request: any) {
 
   // 接受连接
   const connection = request.accept(null, request.origin)
+  connection.binaryType = "arraybuffer"
   const index = clients.push({
     conn: connection,
     id: ''
@@ -162,22 +168,25 @@ function wsServerOnRequest(request: any) {
 
   // 用户发送消息
   connection.on('message', function (message: any) {
-    if (message.type !== 'utf8') return
-    let msgObj
-    try {
-      msgObj = JSON.parse(message.utf8Data)
-      clt('客户端发来的msgObj如下')
-      cl(msgObj)
-    } catch (e) {
-      cer(e)
-      cet('解析客户端发来的消息时候出错啦')
-      return
+    if (message.type === 'utf8') {
+      let msgObj
+      try {
+        msgObj = JSON.parse(message.utf8Data)
+        clt('客户端发来的msgObj如下')
+        cl(msgObj)
+      } catch (e) {
+        ce(e)
+        cet('解析客户端发来的消息时候出错啦')
+        return
+      }
+      MSG_HANDLER[msgObj.type](connection, msgObj.data, index)
+    } else if (message.type === 'binary') {
+      // TODO 接收到二进制数据
     }
-    MSG_HANDLER[msgObj.type](connection, msgObj.data, index)
   })
 
   // 用户断开连接
-  connection.on('close', function (connection: any) {
+  connection.on('close', function () {
     clt('用户断开连接')
 
     // TODO 从已连接列表中移除该客户端 当前做法是直接置空，但是留了个空位

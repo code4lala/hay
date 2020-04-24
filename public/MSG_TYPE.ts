@@ -3,5 +3,6 @@ enum MSG_TYPE {
   GET_FRIENDS, // 请求好友列表
   SEND_CHAT_CONTENT, // 请求发送消息
   GET_CHAT_HISTORY, // 请求聊天记录
+  SEND_IMAGE, // 发送图片
 }
 export default MSG_TYPE

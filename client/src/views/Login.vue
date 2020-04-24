@@ -1,10 +1,13 @@
 <template>
   <div>
-    <img src='../assets/logo.png' alt='How are you!'>
+    <div class='logo_img' style='text-align: center'>
+      <img src='../assets/logo.png' alt='How are you!'>
+    </div>
     <el-input
         v-model='strLoginName'
         v-on:keydown.enter.native='fnLogin'
         clearable
+        style='margin-bottom: 5px; margin-top: 5px'
     >
       <template slot='prepend'>账号</template>
     </el-input>
