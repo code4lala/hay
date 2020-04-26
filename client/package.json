@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "vue-cli-service --port 8888 serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
@@ -21,7 +21,9 @@
     "jquery": "^3.5.0",
     "bootstrap": "^4.4.1",
     "bootstrap-vue": "^2.12.0",
-    "vue-picture-input": "^2.1.6"
+    "vue-picture-input": "^2.1.6",
+    "axios": "^0.19.2",
+    "file-loader": "^6.0.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.18.0",

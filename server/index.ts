@@ -1,24 +1,17 @@
 import {IncomingMessage, ServerResponse} from "http";
 import MSG_BACK_TYPE from "../public/MSG_BACK_TYPE"
 import MSG_TYPE from "../public/MSG_TYPE"
+import PUB_CONST from "../public/PUB_CONST";
+import {clt, cl, cet, ce} from "./Util";
+import FileUploadServer from "./FileUploadServer";
+
+FileUploadServer()
 
 process.title = 'how_are_you_server'
-const WEB_SOCKET_SERVER_PORT = 10086
 const WebSocketServer = require('websocket').server
 const http = require('http')
 
 let clients: any = []
-
-// clt = console log time       cl = console log
-// cet = console error time     ce = console error
-const clt = function (arg: any) {
-  console.log((new Date()) + ' ' + arg)
-}
-const cl = console.log
-const cet = function (arg: any) {
-  console.error((new Date()) + ' ' + arg)
-}
-const ce = console.error
 
 // 连接 mongodb
 const MongoClient = require('mongodb').MongoClient
@@ -144,8 +137,8 @@ MSG_HANDLER[MSG_TYPE.SEND_IMAGE] = function (conn: any, data: any) {
 const server = http.createServer(function (request: IncomingMessage, response: ServerResponse) {
   clt('创建http server' + request + response)
 })
-server.listen(WEB_SOCKET_SERVER_PORT, function () {
-  clt('正在监听端口' + WEB_SOCKET_SERVER_PORT)
+server.listen(PUB_CONST.SERVER_PORT, function () {
+  clt('正在监听端口' + PUB_CONST.SERVER_PORT)
 })
 // WebSocket server
 const wsServer = new WebSocketServer({

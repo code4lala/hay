@@ -1,8 +1,10 @@
 import Vue from "vue";
+import axios from 'axios'
 import Vuex from "vuex";
 import router from "@/router";
 import MSG_BACK_TYPE from "../../../public/MSG_BACK_TYPE"
 import MSG_TYPE from "../../../public/MSG_TYPE"
+import PUB_CONST from "../../../public/PUB_CONST";
 
 Vue.use(Vuex);
 
@@ -102,25 +104,30 @@ const store = new Vuex.Store({
 
     fnSendImageByConnection: function (state: any, imageContent: File) {
       cl('发送图片到服务器')
-      const reader = new FileReader()
-      reader.readAsArrayBuffer(imageContent)
-      reader.onload = function (evt) {
-        if (evt.target!.result instanceof ArrayBuffer) {
-          cl('二进制流图片')
-          cl(store.state.connection.binaryType)
-          cl(evt.target!.result)
-          const result = {
-            type: MSG_TYPE.SEND_IMAGE, data: {
-              sender: store.state.userName,
-              receiver: store.state.strCurrentChatPartner,
-              imageFile: evt.target!.result
-            }
-          }
-          cl(result)
-          cl('发送的是' + (new Uint8Array(evt.target!.result)).buffer)
-          store.state.connection.send((new Uint8Array(evt.target!.result)).buffer)
+      const UPLOAD_IMG_URL =
+        PUB_CONST.HOW_ARE_YOU_URL + ':' +
+        PUB_CONST.FILE_SERVER_PORT +
+        PUB_CONST.API_IMAGE
+      const param = new FormData()
+      // TODO 上传文件时验证用户身份
+      param.append('user', store.state.userName)
+      param.append('password', store.state.userName)
+      param.append('image', imageContent)
+      axios.post(UPLOAD_IMG_URL, param, {
+        headers: {
+          'Content-Type': 'multipart/form-data;charset=UTF-8',
+          'Access-Control-Allow-Origin': 'true'
+        },
+        onUploadProgress: function (e) {
+          cl('上传了' + ((e.loaded / e.total * 100) | 0) + '%;')
         }
-      }
+      }).then(function (response) {
+        cl('上传完成')
+        cl(response)
+      }, function (err) {
+        ce('上传失败')
+        ce(err)
+      })
     }
   },
   actions: {},
