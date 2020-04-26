@@ -102,7 +102,9 @@ const store = new Vuex.Store({
       store.state.connection.send(fnBuildMsg(MSG_TYPE.GET_FRIENDS, store.state.userName))
     },
 
-    fnSendImageByConnection: function (state: any, imageContent: File) {
+    fnSendImageByConnection: function (state: any, imageContent: any) {
+      cl('要发送的图片文件如下')
+      cl(imageContent)
       cl('发送图片到服务器')
       const UPLOAD_IMG_URL =
         PUB_CONST.HOW_ARE_YOU_URL + ':' +
@@ -110,13 +112,13 @@ const store = new Vuex.Store({
         PUB_CONST.API_IMAGE
       const param = new FormData()
       // TODO 上传文件时验证用户身份
+      param.append('image', imageContent)
       param.append('user', store.state.userName)
       param.append('password', store.state.userName)
-      param.append('image', imageContent)
       axios.post(UPLOAD_IMG_URL, param, {
         headers: {
-          'Content-Type': 'multipart/form-data;charset=UTF-8',
-          'Access-Control-Allow-Origin': 'true'
+          'Accept': '*/*',
+          'Content-Type': 'multipart/form-data;charset=UTF-8'
         },
         onUploadProgress: function (e) {
           cl('上传了' + ((e.loaded / e.total * 100) | 0) + '%;')

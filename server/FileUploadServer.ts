@@ -16,26 +16,41 @@ export default function () {
       callback(null, file.fieldname + '-' + Date.now())
     }
   })
-  const upload = multer({storage: storage}).single('image')
+  const upload = multer({storage: storage}).single('upload_image')
   // https://medium.com/@alexishevia/using-cors-in-express-cac7e29b005b
   const ALLOWED_ORIGIN = PUB_CONST.HOW_ARE_YOU_URL + ':' + PUB_CONST.APP_FRONT_END_PORT
   clt('允许前端链接' + ALLOWED_ORIGIN + '访问')
   app.use(cors({
-    origin: ALLOWED_ORIGIN
+    // TODO 这里改成 ALLOWED_ORIGIN
+    origin: '*'
   }))
   app.post(PUB_CONST.API_IMAGE, function (request: any, response: any) {
-    clt('接收到POST请求')
+    clt('接收到POST请求如下')
     cl(request)
     upload(request, response, function (err: any) {
-      clt('保存文件了')
-      // req.file is the `image` file
-      // req.body will hold the text fields, if there were any
-      response.writeHead(200, {'Content-Type': 'text/html'})
+      // TODO 保存成功了，但是下边几个打出来全是undefined
+      /*
+Sun Apr 26 2020 20:40:49 GMT+0800 (GMT+08:00) 保存文件了 文件名如下
+undefined
+undefined
+undefined
+Sun Apr 26 2020 20:40:49 GMT+0800 (GMT+08:00) 数据如下
+undefined
+Sun Apr 26 2020 20:40:49 GMT+0800 (GMT+08:00) 保存文件成功了
+       */
+      clt('保存文件了 文件名如下')
+      cl(request.files)
+      cl(request.files?.length)
+      cl(request.file)
+      clt('数据如下')
+      cl(request.body)
       if (err) {
         clt('保存文件失败了')
+        cl(err)
         return response.end("Error uploading file.")
       }
       clt('保存文件成功了')
+      response.writeHead(200, {'Content-Type': 'text/html'})
       response.end("File is uploaded")
     })
   })

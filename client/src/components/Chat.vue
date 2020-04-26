@@ -20,7 +20,7 @@
               <b-avatar icon='image' variant="light"></b-avatar>
               图片
             </b-button>
-            <b-button variant='light'>
+            <b-button variant='light' v-bind:pressed.sync='isChoosingFile'>
               <b-avatar icon='file-earmark' variant="light"></b-avatar>
               文件
             </b-button>
@@ -48,7 +48,7 @@
             </el-input>
           </div>
           <div
-              v-if='isChoosingImage'
+              v-if='strInputState==="text"'
               style='text-align: center; margin: 0.2em'
           >
             <picture-input
@@ -86,7 +86,8 @@
     data: function () {
       return {
         strMsgToBeSend: '',
-        isChoosingImage: false,
+        // text | image | file
+        strInputState: 'text',
       }
     },
     methods: {
