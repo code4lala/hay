@@ -106,16 +106,12 @@ const store = new Vuex.Store({
       cl('要发送的图片文件如下')
       cl(imageContent)
       cl('发送图片到服务器')
-      const UPLOAD_IMG_URL =
-        PUB_CONST.HOW_ARE_YOU_URL + ':' +
-        PUB_CONST.FILE_SERVER_PORT +
-        PUB_CONST.API_IMAGE
       const param = new FormData()
       // TODO 上传文件时验证用户身份
-      param.append('image', imageContent)
+      param.append(PUB_CONST.UPLOAD_FILE_NAME, imageContent)
       param.append('user', store.state.userName)
       param.append('password', store.state.userName)
-      axios.post(UPLOAD_IMG_URL, param, {
+      axios.post(PUB_CONST.UPLOAD_IMG_URL, param, {
         headers: {
           'Accept': '*/*',
           'Content-Type': 'multipart/form-data;charset=UTF-8'
@@ -125,6 +121,34 @@ const store = new Vuex.Store({
         }
       }).then(function (response) {
         cl('上传完成')
+        // TODO 上传完成
+        cl(response)
+      }, function (err) {
+        ce('上传失败')
+        ce(err)
+      })
+    },
+
+    fnSendFileByConnection: function (state: any, fileContent: any) {
+      cl('要发送的文件如下')
+      cl(fileContent)
+      cl('发送文件到服务器')
+      const param = new FormData()
+      // TODO 上传文件时验证用户身份
+      param.append(PUB_CONST.UPLOAD_FILE_NAME, fileContent)
+      param.append('user', store.state.userName)
+      param.append('password', store.state.userName)
+      axios.post(PUB_CONST.UPLOAD_IMG_URL, param, {
+        headers: {
+          'Accept': '*/*',
+          'Content-Type': 'multipart/form-data;charset=UTF-8'
+        },
+        onUploadProgress: function (e) {
+          cl('上传了' + ((e.loaded / e.total * 100) | 0) + '%;')
+        }
+      }).then(function (response) {
+        cl('上传完成')
+        // TODO 上传完成
         cl(response)
       }, function (err) {
         ce('上传失败')

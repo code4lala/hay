@@ -16,15 +16,15 @@
         <el-footer>
           <b-button-group>
             <!-- see https://bootstrap-vue.js.org/docs/icons choose icons -->
-            <b-button variant='light' v-bind:pressed.sync='isChoosingImage'>
+            <b-button variant='light' v-on:click='strInputState = (strInputState === "image" ? "text" : "image")'>
               <b-avatar icon='image' variant="light"></b-avatar>
               图片
             </b-button>
-            <b-button variant='light' v-bind:pressed.sync='isChoosingFile'>
+            <b-button variant='light' v-on:click='strInputState = (strInputState === "file" ? "text" : "file")'>
               <b-avatar icon='file-earmark' variant="light"></b-avatar>
               文件
             </b-button>
-            <b-button variant='light'>
+            <b-button variant='light' v-on:click='strInputState = (strInputState === "sound" ? "text" : "sound")'>
               <b-avatar icon='soundwave' variant="light"></b-avatar>
               语音
             </b-button>
@@ -33,10 +33,9 @@
               视频
             </b-button>
           </b-button-group>
-          <div
-              style='text-align: center;'>
+          <div style='text-align: center;'>
             <el-input
-                v-show='!isChoosingImage'
+                v-show='strInputState === "text"'
                 type='textarea'
                 :autosize="{ minRows: 2, maxRows: 4}"
                 v-model='strMsgToBeSend'
@@ -46,28 +45,38 @@
                 style='margin-top: 0.2em; margin-bottom: 0.2em;'
             >
             </el-input>
-          </div>
-          <div
-              v-if='strInputState==="text"'
-              style='text-align: center; margin: 0.2em'
-          >
-            <picture-input
-                ref="pictureInput"
-                @change="fnUploadImageOnChange"
-                width="600"
-                height="200"
-                margin="16"
-                accept="image/jpeg,image/png"
-                size="10"
-                :removable="true"
-                :customStrings="{
+            <div
+                v-if='strInputState === "image"'
+                style='text-align: center; margin: 0.2em'
+            >
+              <picture-input
+                  ref="pictureInput"
+                  @change="fnUploadImageOnChange"
+                  width="600"
+                  height="200"
+                  margin="16"
+                  size="10"
+                  :removable="true"
+                  :customStrings="{
                   upload: '上传',
                   drag: '拖拽图片或点击选取'
                 }">
-            </picture-input>
-            <el-button style='margin-top: 0.2em' @click='fnSendImage'>
-              发送
-            </el-button>
+              </picture-input>
+              <el-button style='margin-top: 0.2em' @click='fnSendImage'>
+                发送
+              </el-button>
+            </div>
+            <div
+                v-show='strInputState === "file"'>
+              <b-form-file
+                  v-model='fileToBeUpload'
+                  placeholder='选取文件'
+                  drop-placeholder='拖拽文件到此处'>
+              </b-form-file>
+              <el-button style='margin-top: 0.2em' @click='fnSendFile'>
+                发送
+              </el-button>
+            </div>
           </div>
         </el-footer>
       </el-container>
@@ -88,6 +97,7 @@
         strMsgToBeSend: '',
         // text | image | file
         strInputState: 'text',
+        fileToBeUpload: null,
       }
     },
     methods: {
@@ -120,6 +130,13 @@
         store.commit('fnSendImageByConnection',
           this.$refs.pictureInput.file)
         this.isChoosingImage = false
+      },
+      fnSendFile() {
+        // TODO
+        console.log('此处发送文件')
+        console.log(this.fileToBeUpload)
+        store.commit('fnSendFileByConnection',
+          this.fileToBeUpload)
       }
     },
     components: {
