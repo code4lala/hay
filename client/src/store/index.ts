@@ -26,7 +26,8 @@ const store = new Vuex.Store({
     userName: '',
     arrayFriendItems: [],
     arrayHistoryMsgItems: [],
-    strCurrentChatPartner: ''
+    strCurrentChatPartner: '',
+    intUploadProgress: 0,
   },
   mutations: {
     fnInitConnection() {
@@ -109,15 +110,19 @@ const store = new Vuex.Store({
       const param = new FormData()
       // TODO 上传文件时验证用户身份
       param.append(PUB_CONST.UPLOAD_FILE_NAME, imageContent)
-      param.append('user', store.state.userName)
+      param.append('sender', store.state.userName)
       param.append('password', store.state.userName)
+      param.append('receiver', store.state.strCurrentChatPartner)
+      param.append('timestamp', (Date.now()).toString())
+      param.append('type', MSG_TYPE.SEND_IMAGE.toString())
       axios.post(PUB_CONST.UPLOAD_IMG_URL, param, {
         headers: {
           'Accept': '*/*',
           'Content-Type': 'multipart/form-data;charset=UTF-8'
         },
         onUploadProgress: function (e) {
-          cl('上传了' + ((e.loaded / e.total * 100) | 0) + '%;')
+          store.state.intUploadProgress = Math.floor(e.loaded / e.total * 100)
+          cl('上传了' + store.state.intUploadProgress + '%')
         }
       }).then(function (response) {
         cl('上传完成')
@@ -136,15 +141,19 @@ const store = new Vuex.Store({
       const param = new FormData()
       // TODO 上传文件时验证用户身份
       param.append(PUB_CONST.UPLOAD_FILE_NAME, fileContent)
-      param.append('user', store.state.userName)
+      param.append('sender', store.state.userName)
       param.append('password', store.state.userName)
-      axios.post(PUB_CONST.UPLOAD_IMG_URL, param, {
+      param.append('receiver', store.state.strCurrentChatPartner)
+      param.append('timestamp', (Date.now()).toString())
+      param.append('type', MSG_TYPE.SEND_FILE.toString())
+      axios.post(PUB_CONST.UPLOAD_FILE_URL, param, {
         headers: {
           'Accept': '*/*',
           'Content-Type': 'multipart/form-data;charset=UTF-8'
         },
         onUploadProgress: function (e) {
-          cl('上传了' + ((e.loaded / e.total * 100) | 0) + '%;')
+          store.state.intUploadProgress = Math.floor(e.loaded / e.total * 100)
+          cl('上传了' + store.state.intUploadProgress + '%')
         }
       }).then(function (response) {
         cl('上传完成')

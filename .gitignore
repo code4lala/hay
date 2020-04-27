@@ -1,3 +1,8 @@
+# 自定义文件
+
+# 服务端接收到的上传的文件所在文件夹
+server/uploads
+
 # Logs
 logs
 *.log

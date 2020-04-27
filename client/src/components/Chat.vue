@@ -37,7 +37,7 @@
             <el-input
                 v-show='strInputState === "text"'
                 type='textarea'
-                :autosize="{ minRows: 2, maxRows: 4}"
+                :autosize="{ minRows: 4, maxRows: 4}"
                 v-model='strMsgToBeSend'
                 v-on:keydown.enter.exact.prevent.native='fnSendMsg'
                 v-on:keydown.enter.ctrl.prevent.native='fnAppendNewLine'
@@ -63,7 +63,7 @@
                 }">
               </picture-input>
               <el-button style='margin-top: 0.2em' @click='fnSendImage'>
-                发送
+                发送图片 已发送{{$store.state.intUploadProgress}}%
               </el-button>
             </div>
             <div
@@ -74,7 +74,7 @@
                   drop-placeholder='拖拽文件到此处'>
               </b-form-file>
               <el-button style='margin-top: 0.2em' @click='fnSendFile'>
-                发送
+                发送文件 已发送{{$store.state.intUploadProgress}}%
               </el-button>
             </div>
           </div>
@@ -129,10 +129,9 @@
         console.log('此处发送图片')
         store.commit('fnSendImageByConnection',
           this.$refs.pictureInput.file)
-        this.isChoosingImage = false
       },
       fnSendFile() {
-        // TODO
+        if (this.fileToBeUpload === null) return
         console.log('此处发送文件')
         console.log(this.fileToBeUpload)
         store.commit('fnSendFileByConnection',

@@ -3,6 +3,7 @@ import MSG_BACK_TYPE from "../public/MSG_BACK_TYPE"
 import MSG_TYPE from "../public/MSG_TYPE"
 import PUB_CONST from "../public/PUB_CONST";
 import {clt, cl, cet, ce} from "./Util";
+import {dbo} from "./MongoDBObject";
 import FileUploadServer from "./FileUploadServer";
 
 FileUploadServer()
@@ -12,19 +13,6 @@ const WebSocketServer = require('websocket').server
 const http = require('http')
 
 let clients: any = []
-
-// 连接 mongodb
-const MongoClient = require('mongodb').MongoClient
-const MONGODB_URL = 'mongodb://localhost'
-let dbo: any = null
-MongoClient.connect(MONGODB_URL,
-  {useNewUrlParser: true, useUnifiedTopology: true},
-  function (err: any, mongodb: any) {
-    if (err) throw err
-    dbo = mongodb.db('hay')
-    clt('MongoDB数据库连接成功')
-  })
-
 
 let MSG_HANDLER: any = []
 MSG_HANDLER[MSG_TYPE.LOGIN] = function (conn: any, data: string, index: any) {
