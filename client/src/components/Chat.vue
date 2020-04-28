@@ -146,8 +146,19 @@
         if (this.fileToBeUpload === null) return
         console.log('此处发送文件')
         console.log(this.fileToBeUpload)
-        store.commit('fnSendFileByConnection',
-          this.fileToBeUpload)
+        store.commit('fnSendFileByConnection', {
+          file: this.fileToBeUpload,
+          callback: function (uploadResult) {
+            if (uploadResult) {
+              console.log('文件发送成功')
+              store.state.intUploadProgress = 0
+              store.commit('fnGetHistoryMsgByConnection')
+            } else {
+              console.error('文件发送失败')
+              // TODO 文件发送失败
+            }
+          }
+        })
       }
     },
     components: {

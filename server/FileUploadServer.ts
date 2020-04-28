@@ -109,24 +109,56 @@ export default function () {
       }
       clt('保存文件成功了')
       // TODO 写入数据库 返回 返回啥呢？？？？
-      const insertData = {
-        sender: request.body.sender,
-        receiver: request.body.receiver,
-        timestamp: parseInt(request.body.timestamp),
-        msg: request.file.filename,
-        type: 'file'
-      }
-      clt('存入聊天记录的内容如下')
-      cl(insertData)
-      dbo.collection('chat_history').insertOne(insertData, function (err: any) {
-        if (err) throw err
-        clt('保存文件聊天记录' + request.file.filename + '成功')
-      })
-
-      response.writeHead(200, {'Content-Type': 'text/html'})
-      response.end("File is uploaded")
+      fs.createReadStream(request.file.path)
+        .pipe(fsBucket.openUploadStream(request.file.filename))
+        .on('error', function (err: any) {
+          assert.ifError(err)
+        })
+        .on('finish', function () {
+          clt('存入数据库' + request.file.filename + '成功')
+          const insertData = {
+            sender: request.body.sender,
+            receiver: request.body.receiver,
+            timestamp: parseInt(request.body.timestamp),
+            msg: request.file.filename,
+            type: 'file'
+          }
+          clt('存入聊天记录的内容如下')
+          cl(insertData)
+          dbo.collection('chat_history').insertOne(insertData, function (err: any) {
+            if (err) throw err
+            clt('保存文件聊天记录' + request.file.filename + '成功')
+            // 提醒接收方有新消息
+            fnNotifyNewMsg(insertData)
+            response.writeHead(200, {'Content-Type': 'text/html'})
+            response.end("File is uploaded")
+          })
+        })
     })
   })
+
+  app.post(PUB_CONST.DOWNLOAD_FILE, jsonParser, function (request: any, response: any) {
+    clt('接收到下载文件的请求')
+    cl(request.body)
+    fsBucket.find({
+      filename: request.body.msg
+    }).toArray(function (err: any, files: any) {
+      assert.ifError(err)
+      if (!files || files.length === 0) {
+        response.writeHead(404, {'Content-Type': 'text/html'})
+        response.end("找不到文件")
+        return
+      }
+      cl(files[0])
+      response.writeHead(200, {
+        'Content-Type': 'mimetype',
+        'Content-disposition': contentDisposition(files[0].filename),
+        'Content-Length': files[0].length
+      })
+      fsBucket.openDownloadStreamByName(request.body.msg).pipe(response)
+    })
+  })
+
   app.listen(PUB_CONST.FILE_SERVER_PORT, function () {
     clt("文件上传服务器运行在端口 " + PUB_CONST.FILE_SERVER_PORT)
   })
