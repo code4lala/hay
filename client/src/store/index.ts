@@ -141,7 +141,7 @@ const store = new Vuex.Store({
       // TODO 从服务器下载图片
       cl('下载图片')
       cl(itemAndCallback)
-      // TODO 下载文件时验证用户身份
+      // TODO 下载图片时验证用户身份
       axios({
         url: PUB_CONST.DOWNLOAD_IMG_URL,
         method: "POST",
@@ -165,13 +165,13 @@ const store = new Vuex.Store({
       })
     },
 
-    fnSendFileByConnection: function (state: any, fileContent: any) {
+    fnSendFileByConnection: function (state: any, fileAndCallback: any) {
       cl('要发送的文件如下')
-      cl(fileContent)
+      cl(fileAndCallback)
       cl('发送文件到服务器')
       const param = new FormData()
       // TODO 上传文件时验证用户身份
-      param.append(PUB_CONST.UPLOAD_FILE_NAME, fileContent)
+      param.append(PUB_CONST.UPLOAD_FILE_NAME, fileAndCallback.file)
       param.append('sender', store.state.userName)
       param.append('password', store.state.userName)
       param.append('receiver', store.state.strCurrentChatPartner)
@@ -190,11 +190,42 @@ const store = new Vuex.Store({
         cl('上传完成')
         // TODO 上传完成
         cl(response)
+        fileAndCallback.callback(true)
       }, function (err) {
         ce('上传失败')
         ce(err)
+        fileAndCallback.callback(false)
       })
-    }
+    },
+
+
+    fnGetFileByConnection: function (state: any, itemAndCallback: any) {
+      // TODO 从服务器下载文件
+      cl('下载文件')
+      cl(itemAndCallback)
+      // TODO 下载文件时验证用户身份
+      axios({
+        url: PUB_CONST.DOWNLOAD_FILE_URL,
+        method: "POST",
+        data: {
+          sender: itemAndCallback.msgItem.sender,
+          password: itemAndCallback.msgItem.sender,
+          receiver: itemAndCallback.msgItem.receiver,
+          timestamp: itemAndCallback.msgItem.timestamp,
+          type: itemAndCallback.msgItem.type,
+          msg: itemAndCallback.msgItem.msg
+        },
+        responseType: 'blob'
+      }).then(function (response) {
+        cl('下载完成')
+        // TODO 下载完成
+        cl(response)
+        itemAndCallback.callback(response.data)
+      }, function (err) {
+        ce('下载失败')
+        ce(err)
+      })
+    },
   },
   actions: {},
   modules: {}

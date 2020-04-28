@@ -56,6 +56,18 @@
       fnDownloadFile() {
         // TODO 下载文件
         console.log('下载文件' + this.msgItem.msg)
+        store.commit('fnGetFileByConnection', {
+          msgItem: this.msgItem,
+          callback: function (file) {
+            console.log('接收到文件地址，弹出下载窗口')
+            console.log(file)
+            // 弹出下载链接
+            const downloadLink = document.createElement('a')
+            downloadLink.href = URL.createObjectURL(file)
+            downloadLink.download = this.msgItem.msg
+            downloadLink.click()
+          }
+        })
       }
     },
   }
