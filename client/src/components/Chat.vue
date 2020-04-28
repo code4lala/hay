@@ -14,6 +14,7 @@
           </HistoryMsgList>
         </el-main>
         <el-footer>
+          <div style='text-align: center'>
           <b-button-group>
             <!-- see https://bootstrap-vue.js.org/docs/icons choose icons -->
             <b-button variant='light' v-on:click='strInputState = (strInputState === "image" ? "text" : "image")'>
@@ -24,16 +25,21 @@
               <b-avatar icon='file-earmark' variant="light"></b-avatar>
               文件
             </b-button>
-            <b-button variant='light' v-on:click='strInputState = (strInputState === "sound" ? "text" : "sound")'>
-              <b-avatar icon='soundwave' variant="light"></b-avatar>
+            <b-button variant='light' v-on:click='strInputState = (strInputState === "audio" ? "text" : "audio")'>
+              <b-avatar icon='play' variant="light"></b-avatar>
               语音
             </b-button>
             <b-button variant='light'>
+              <b-avatar icon='soundwave' variant="light"></b-avatar>
+              语音聊天
+            </b-button>
+            <b-button variant='light'>
               <b-avatar icon='camera-video' variant="light"></b-avatar>
-              视频
+              视频聊天
             </b-button>
           </b-button-group>
-          <div style='text-align: center;'>
+          </div>
+          <div style='text-align: center; margin: 0.5em'>
             <el-input
                 v-show='strInputState === "text"'
                 type='textarea'
@@ -42,19 +48,15 @@
                 v-on:keydown.enter.exact.prevent.native='fnSendMsg'
                 v-on:keydown.enter.ctrl.prevent.native='fnAppendNewLine'
                 id='el_input_textarea'
-                style='margin-top: 0.2em; margin-bottom: 0.2em;'
             >
             </el-input>
-            <div
-                v-if='strInputState === "image"'
-                style='text-align: center; margin: 0.2em'
+            <div v-if='strInputState === "image"'
             >
               <picture-input
                   ref="pictureInput"
                   @change="fnUploadImageOnChange"
                   width="600"
                   height="200"
-                  margin="16"
                   size="10"
                   :removable="true"
                   :customStrings="{
@@ -62,20 +64,30 @@
                   drag: '拖拽图片或点击选取'
                 }">
               </picture-input>
-              <el-button style='margin-top: 0.2em' @click='fnSendImage'>
+              <el-button @click='fnSendImage' style='margin-top: 0.5em'>
                 发送图片 已发送{{$store.state.intUploadProgress}}%
               </el-button>
             </div>
-            <div
-                v-show='strInputState === "file"'>
+            <div v-show='strInputState === "file"'>
               <b-form-file
                   v-model='fileToBeUpload'
                   placeholder='选取文件'
                   drop-placeholder='拖拽文件到此处'>
               </b-form-file>
-              <el-button style='margin-top: 0.2em' @click='fnSendFile'>
+              <el-button @click='fnSendFile' style='margin-top: 0.5em'>
                 发送文件 已发送{{$store.state.intUploadProgress}}%
               </el-button>
+            </div>
+            <div v-show='strInputState==="audio"'>
+              <!--suppress HtmlUnknownTarget -->
+              <audio controls v-bind:src='strRecordBlobUrl'></audio>
+              <br>
+              <el-button-group>
+                <el-button v-on:click='fnRecordStart'>开始</el-button>
+                <el-button v-on:click='fnRecordPause'>暂停</el-button>
+                <el-button v-on:click='fnRecordClear'>清除</el-button>
+                <el-button type='success' v-on:click='fnSendRecord'>发送</el-button>
+              </el-button-group>
             </div>
           </div>
         </el-footer>
@@ -89,15 +101,22 @@
   import FriendList from '@/components/chat_ui/FriendList.vue'
   import store from '@/store'
   import PictureInput from 'vue-picture-input'
+  import Recorderx, { ENCODE_TYPE } from "recorderx"
+  import MSG_TYPE from '../../../public/MSG_TYPE'
+  import PUB_CONST from '../../../public/PUB_CONST'
+
+  const rc = new Recorderx()
 
   export default {
     name: 'Chat',
     data: function () {
       return {
         strMsgToBeSend: '',
-        // text | image | file
+        // text | image | file | audio
         strInputState: 'text',
         fileToBeUpload: null,
+        wavRecord: null,
+        strRecordBlobUrl: '',
       }
     },
     methods: {
@@ -127,8 +146,10 @@
       fnSendImage() {
         if (!this.$refs.pictureInput.image) return
         console.log('此处发送图片')
-        store.commit('fnSendImageByConnection', {
-          imgFile: this.$refs.pictureInput.file,
+        store.commit('fnSendFileByConnection', {
+          file: this.$refs.pictureInput.file,
+          sendMsgType: MSG_TYPE.SEND_IMAGE,
+          uploadUrl: PUB_CONST.UPLOAD_IMG_URL,
           callback: function (uploadResult) {
             if (uploadResult) {
               console.log('图片发送成功')
@@ -148,6 +169,8 @@
         console.log(this.fileToBeUpload)
         store.commit('fnSendFileByConnection', {
           file: this.fileToBeUpload,
+          sendMsgType: MSG_TYPE.SEND_FILE,
+          uploadUrl: PUB_CONST.UPLOAD_FILE_URL,
           callback: function (uploadResult) {
             if (uploadResult) {
               console.log('文件发送成功')
@@ -159,6 +182,35 @@
             }
           }
         })
+      },
+
+      fnRecordStart() {
+        rc.start().then(function () {
+          console.log('开始录制')
+        }).catch(function (err) {
+          console.error('录制失败')
+          console.error(err)
+        })
+      },
+      fnRecordPause() {
+        rc.pause()
+        console.log('暂停录制')
+        this.wavRecord=rc.getRecord({
+          encodeTo: ENCODE_TYPE.WAV,
+          compressible: true
+        })
+        this.strRecordBlobUrl = URL.createObjectURL(this.wavRecord)
+      },
+      fnRecordClear() {
+        rc.clear()
+        console.log('清除录音')
+        this.wavRecord=null
+        this.strRecordBlobUrl=''
+      },
+      fnSendRecord() {
+        if(this.wavRecord===null)return
+        console.log('发送语音消息')
+        console.log(this.wavRecord)
       }
     },
     components: {

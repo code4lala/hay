@@ -104,67 +104,6 @@ const store = new Vuex.Store({
       store.state.connection.send(fnBuildMsg(MSG_TYPE.GET_FRIENDS, store.state.userName))
     },
 
-    fnSendImageByConnection: function (state: any, imageAndCallback: any) {
-      cl('要发送的图片文件如下')
-      cl(imageAndCallback)
-      cl('发送图片到服务器')
-      const param = new FormData()
-      // TODO 上传文件时验证用户身份
-      param.append(PUB_CONST.UPLOAD_FILE_NAME, imageAndCallback.imgFile)
-      param.append('sender', store.state.userName)
-      param.append('password', store.state.userName)
-      param.append('receiver', store.state.strCurrentChatPartner)
-      param.append('timestamp', (Date.now()).toString())
-      param.append('type', MSG_TYPE.SEND_IMAGE.toString())
-      axios.post(PUB_CONST.UPLOAD_IMG_URL, param, {
-        headers: {
-          'Accept': '*/*',
-          'Content-Type': 'multipart/form-data;charset=UTF-8'
-        },
-        onUploadProgress: function (e) {
-          store.state.intUploadProgress = Math.floor(e.loaded / e.total * 100)
-          cl('上传了' + store.state.intUploadProgress + '%')
-        }
-      }).then(function (response) {
-        cl('上传完成')
-        // TODO 上传完成
-        cl(response)
-        imageAndCallback.callback(true)
-      }, function (err) {
-        ce('上传失败')
-        ce(err)
-        imageAndCallback.callback(false)
-      })
-    },
-
-    fnGetImageByConnection: function (state: any, itemAndCallback: any) {
-      // TODO 从服务器下载图片
-      cl('下载图片')
-      cl(itemAndCallback)
-      // TODO 下载图片时验证用户身份
-      axios({
-        url: PUB_CONST.DOWNLOAD_IMG_URL,
-        method: "POST",
-        data: {
-          sender: itemAndCallback.msgItem.sender,
-          password: itemAndCallback.msgItem.sender,
-          receiver: itemAndCallback.msgItem.receiver,
-          timestamp: itemAndCallback.msgItem.timestamp,
-          type: itemAndCallback.msgItem.type,
-          msg: itemAndCallback.msgItem.msg
-        },
-        responseType: 'blob'
-      }).then(function (response) {
-        cl('下载完成')
-        // TODO 下载完成
-        cl(response)
-        itemAndCallback.callback(response.data)
-      }, function (err) {
-        ce('下载失败')
-        ce(err)
-      })
-    },
-
     fnSendFileByConnection: function (state: any, fileAndCallback: any) {
       cl('要发送的文件如下')
       cl(fileAndCallback)
@@ -176,8 +115,8 @@ const store = new Vuex.Store({
       param.append('password', store.state.userName)
       param.append('receiver', store.state.strCurrentChatPartner)
       param.append('timestamp', (Date.now()).toString())
-      param.append('type', MSG_TYPE.SEND_FILE.toString())
-      axios.post(PUB_CONST.UPLOAD_FILE_URL, param, {
+      param.append('type', fileAndCallback.sendMsgType.toString())
+      axios.post(fileAndCallback.uploadUrl, param, {
         headers: {
           'Accept': '*/*',
           'Content-Type': 'multipart/form-data;charset=UTF-8'
@@ -198,14 +137,13 @@ const store = new Vuex.Store({
       })
     },
 
-
     fnGetFileByConnection: function (state: any, itemAndCallback: any) {
       // TODO 从服务器下载文件
       cl('下载文件')
       cl(itemAndCallback)
       // TODO 下载文件时验证用户身份
       axios({
-        url: PUB_CONST.DOWNLOAD_FILE_URL,
+        url: itemAndCallback.downloadUrl,
         method: "POST",
         data: {
           sender: itemAndCallback.msgItem.sender,

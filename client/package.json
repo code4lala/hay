@@ -23,7 +23,8 @@
     "bootstrap-vue": "^2.12.0",
     "vue-picture-input": "^2.1.6",
     "axios": "^0.19.2",
-    "file-loader": "^6.0.0"
+    "file-loader": "^6.0.0",
+    "recorderx": "^2.0.2"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.18.0",

@@ -12,6 +12,13 @@
     {{msgItem.sender}} @ {{new Date(msgItem.timestamp).toLocaleString()}} : {{msgItem.msg}}
     <b-button v-on:click='fnDownloadFile'>下载文件</b-button>
   </li>
+  <li v-else-if='msgItem.type==="audio"'>
+    {{msgItem.sender}} @ {{new Date(msgItem.timestamp).toLocaleString()}} :
+    <!--suppress HtmlUnknownTarget -->
+    <audio controls v-bind:src='strAudioSrc'></audio>
+    <!--suppress HtmlUnknownTarget -->
+    <audio controls v-bind:src='fnGetAudio' v-show='false'></audio>
+  </li>
   <li v-else>
     {{msgItem.sender}} @ {{new Date(msgItem.timestamp).toLocaleString()}} : {{msgItem.msg}}
   </li>
@@ -19,6 +26,7 @@
 
 <script lang='js'>
   import store from '../../store'
+  import PUB_CONST from '../../../../public/PUB_CONST';
 
   export default {
     name: 'HistoryMsgItem',
@@ -30,26 +38,35 @@
     data: function () {
       return {
         strImageSrc: '',
-        succeed: false
+        bSucceedGotImage: false,
+        strAudioSrc: '',
+        bSucceedGotAudio: false,
       }
     },
     computed: {
       fnGetImage: function () {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const that = this
-        if (this.succeed) return
-        store.commit('fnGetImageByConnection', {
+        if (this.bSucceedGotImage) return
+        store.commit('fnGetFileByConnection', {
           msgItem: this.msgItem,
+          downloadUrl: PUB_CONST.DOWNLOAD_IMG_URL,
           callback: function (img) {
             console.log('回调设置图片地址')
             console.log(img)
             const imgUrl = URL.createObjectURL(img)
             console.log(imgUrl)
             that.strImageSrc = imgUrl
-            that.succeed = true
+            that.bSucceedGotImage = true
           }
         })
         return this.strImageSrc
+      },
+
+      fnGetAudio: function () {
+        // TODO 获取音频消息
+        console.log('获取音频消息')
+        return ''
       },
     },
     methods: {
@@ -58,6 +75,7 @@
         console.log('下载文件' + this.msgItem.msg)
         store.commit('fnGetFileByConnection', {
           msgItem: this.msgItem,
+          downloadUrl: PUB_CONST.DOWNLOAD_FILE_URL,
           callback: function (file) {
             console.log('接收到文件地址，弹出下载窗口')
             console.log(file)
