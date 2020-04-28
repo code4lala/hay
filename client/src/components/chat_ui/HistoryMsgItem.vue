@@ -50,7 +50,7 @@
         if (this.bSucceedGotImage) return
         store.commit('fnGetFileByConnection', {
           msgItem: this.msgItem,
-          downloadUrl: PUB_CONST.DOWNLOAD_IMG_URL,
+          downloadUrl: PUB_CONST.DOWNLOAD_FILE_URL,
           callback: function (img) {
             console.log('回调设置图片地址')
             console.log(img)

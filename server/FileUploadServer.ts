@@ -73,27 +73,6 @@ export default function () {
         })
     })
   })
-  app.post(PUB_CONST.DOWNLOAD_IMAGE, jsonParser, function (request: any, response: any) {
-    clt('接收到下载图片的请求')
-    cl(request.body)
-    fsBucket.find({
-      filename: request.body.msg
-    }).toArray(function (err: any, files: any) {
-      assert.ifError(err)
-      if (!files || files.length === 0) {
-        response.writeHead(404, {'Content-Type': 'text/html'})
-        response.end("找不到图片")
-        return
-      }
-      cl(files[0])
-      response.writeHead(200, {
-        'Content-Type': 'mimetype',
-        'Content-disposition': contentDisposition(files[0].filename),
-        'Content-Length': files[0].length
-      })
-      fsBucket.openDownloadStreamByName(request.body.msg).pipe(response)
-    })
-  })
 
   app.post(PUB_CONST.API_FILE, function (request: any, response: any) {
     upload(request, response, function (err: any) {
