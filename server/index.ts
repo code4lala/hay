@@ -4,6 +4,7 @@ import MSG_TYPE from "../public/MSG_TYPE"
 import PUB_CONST from "../public/PUB_CONST";
 import {clt, cl, cet, ce} from "./Util";
 import {dbo} from "./MongoDBObject";
+import {clients, fnNotifyNewMsg} from "./ServerVar";
 import FileUploadServer from "./FileUploadServer";
 
 FileUploadServer()
@@ -11,8 +12,6 @@ FileUploadServer()
 process.title = 'how_are_you_server'
 const WebSocketServer = require('websocket').server
 const http = require('http')
-
-let clients: any = []
 
 let MSG_HANDLER: any = []
 MSG_HANDLER[MSG_TYPE.LOGIN] = function (conn: any, data: string, index: any) {
@@ -51,25 +50,7 @@ MSG_HANDLER[MSG_TYPE.SEND_CHAT_CONTENT] = function (conn: any, data: any) {
       type: MSG_BACK_TYPE.GOT_MSG,
       data: data
     }))
-    // 提醒对方有新消息到达 TODO 如何给指定客户端发消息
-    // 查找对方是否在线
-    clt('当前有' + clients.length + '个已连接用户')
-    for (let i = 0; i < clients.length; i++) {
-      // TODO 把是否为null去掉
-      if (clients[i] === null) continue
-      if (clients[i].id === data.receiver) {
-        clt('聊天对象' + data.receiver + '在线')
-        clients[i].conn.sendUTF(JSON.stringify({
-          type: MSG_BACK_TYPE.GOT_NEW_MSG,
-          data: data
-        }))
-        clt('已通知对方有新消息')
-        return // TODO 改成break
-      }
-    }
-    // TODO 删掉debug
-    clt('聊天对象' + data.receiver + '不在线')
-    cl(clients)
+    fnNotifyNewMsg(data)
   })
 }
 MSG_HANDLER[MSG_TYPE.GET_CHAT_HISTORY] = function (conn: any, data: any) {

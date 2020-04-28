@@ -2,6 +2,7 @@
 import PUB_CONST from "../public/PUB_CONST"
 import {clt, cl, cet, ce} from "./Util"
 import {dbo, fsBucket} from "./MongoDBObject"
+import {fnNotifyNewMsg} from "./ServerVar";
 
 export default function () {
   const express = require("express")
@@ -64,9 +65,11 @@ export default function () {
           dbo.collection('chat_history').insertOne(insertData, function (err: any) {
             if (err) throw err
             clt('保存图片聊天记录' + request.file.filename + '成功')
+            // 提醒接收方有新消息
+            fnNotifyNewMsg(insertData)
+            response.writeHead(200, {'Content-Type': 'text/html'})
+            response.end("Image is uploaded")
           })
-          response.writeHead(200, {'Content-Type': 'text/html'})
-          response.end("Image is uploaded")
         })
     })
   })
