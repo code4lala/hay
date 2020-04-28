@@ -103,7 +103,6 @@
   import PictureInput from 'vue-picture-input'
   import Recorderx, { ENCODE_TYPE } from "recorderx"
   import MSG_TYPE from '../../../public/MSG_TYPE'
-  import PUB_CONST from '../../../public/PUB_CONST'
 
   const rc = new Recorderx()
 
@@ -149,7 +148,6 @@
         store.commit('fnSendFileByConnection', {
           file: this.$refs.pictureInput.file,
           sendMsgType: MSG_TYPE.SEND_IMAGE,
-          uploadUrl: PUB_CONST.UPLOAD_IMG_URL,
           callback: function (uploadResult) {
             if (uploadResult) {
               console.log('图片发送成功')
@@ -170,7 +168,6 @@
         store.commit('fnSendFileByConnection', {
           file: this.fileToBeUpload,
           sendMsgType: MSG_TYPE.SEND_FILE,
-          uploadUrl: PUB_CONST.UPLOAD_FILE_URL,
           callback: function (uploadResult) {
             if (uploadResult) {
               console.log('文件发送成功')

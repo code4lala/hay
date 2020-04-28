@@ -116,7 +116,7 @@ const store = new Vuex.Store({
       param.append('receiver', store.state.strCurrentChatPartner)
       param.append('timestamp', (Date.now()).toString())
       param.append('type', fileAndCallback.sendMsgType.toString())
-      axios.post(fileAndCallback.uploadUrl, param, {
+      axios.post(PUB_CONST.UPLOAD_FILE_URL, param, {
         headers: {
           'Accept': '*/*',
           'Content-Type': 'multipart/form-data;charset=UTF-8'
@@ -143,7 +143,7 @@ const store = new Vuex.Store({
       cl(itemAndCallback)
       // TODO 下载文件时验证用户身份
       axios({
-        url: itemAndCallback.downloadUrl,
+        url: PUB_CONST.DOWNLOAD_FILE_URL,
         method: "POST",
         data: {
           sender: itemAndCallback.msgItem.sender,

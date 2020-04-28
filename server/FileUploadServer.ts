@@ -3,6 +3,7 @@ import PUB_CONST from "../public/PUB_CONST"
 import {clt, cl, cet, ce} from "./Util"
 import {dbo, fsBucket} from "./MongoDBObject"
 import {fnNotifyNewMsg} from "./ServerVar";
+import MSG_TYPE from "../public/MSG_TYPE";
 
 export default function () {
   const express = require("express")
@@ -32,47 +33,6 @@ export default function () {
   app.use(cors({
     origin: PUB_CONST.ALLOWED_ORIGIN
   }))
-  app.post(PUB_CONST.API_IMAGE, function (request: any, response: any) {
-    upload(request, response, function (err: any) {
-      clt('保存图片了 图片如下')
-      cl(request.file)
-      clt('同时接收到该POST的数据如下')
-      cl(request.body)
-      // TODO 用户身份鉴权
-      if (err) {
-        clt('保存图片失败了')
-        cl(err)
-        return response.end("Error uploading image.")
-      }
-      clt('保存图片成功了')
-      // TODO 写入数据库 返回 返回啥呢？？？？
-      fs.createReadStream(request.file.path)
-        .pipe(fsBucket.openUploadStream(request.file.filename))
-        .on('error', function (err: any) {
-          assert.ifError(err)
-        })
-        .on('finish', function () {
-          clt('存入数据库' + request.file.filename + '成功')
-          const insertData = {
-            sender: request.body.sender,
-            receiver: request.body.receiver,
-            timestamp: parseInt(request.body.timestamp),
-            msg: request.file.filename,
-            type: 'image'
-          }
-          clt('存入聊天记录的内容如下')
-          cl(insertData)
-          dbo.collection('chat_history').insertOne(insertData, function (err: any) {
-            if (err) throw err
-            clt('保存图片聊天记录' + request.file.filename + '成功')
-            // 提醒接收方有新消息
-            fnNotifyNewMsg(insertData)
-            response.writeHead(200, {'Content-Type': 'text/html'})
-            response.end("Image is uploaded")
-          })
-        })
-    })
-  })
 
   app.post(PUB_CONST.API_FILE, function (request: any, response: any) {
     upload(request, response, function (err: any) {
@@ -95,12 +55,22 @@ export default function () {
         })
         .on('finish', function () {
           clt('存入数据库' + request.file.filename + '成功')
+          let msgType=''
+          switch (request.body.type) {
+            case MSG_TYPE.SEND_IMAGE.toString():
+              msgType='image'
+              break
+            case MSG_TYPE.SEND_FILE.toString():
+              msgType='file'
+              break
+          }
           const insertData = {
             sender: request.body.sender,
             receiver: request.body.receiver,
             timestamp: parseInt(request.body.timestamp),
             msg: request.file.filename,
-            type: 'file'
+            // 唯一的不同点
+            type: msgType
           }
           clt('存入聊天记录的内容如下')
           cl(insertData)
