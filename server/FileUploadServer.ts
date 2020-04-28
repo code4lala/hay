@@ -10,7 +10,7 @@ export default function () {
   const app = express()
   const bodyParser = require('body-parser')
   const jsonParser = bodyParser.json()
-  const urlencodedParser = bodyParser.urlencoded({ extended: false })
+  const contentDisposition = require('content-disposition')
   const fs = require('fs')
   const assert = require('assert')
   const storage = multer.diskStorage({
@@ -19,6 +19,7 @@ export default function () {
       callback(null, './uploads')
     },
     filename: function (req: any, file: any, callback: any) {
+      // 示例 upload_file_name-1587990848907-5008.png
       callback(null, file.fieldname + '-' + Date.now() + '-' + file.originalname)
     }
   })
@@ -72,8 +73,23 @@ export default function () {
   app.post(PUB_CONST.DOWNLOAD_IMAGE, jsonParser, function (request: any, response: any) {
     clt('接收到下载图片的请求')
     cl(request.body)
-    response.writeHead(200, {'Content-Type': 'text/html'})
-    response.end("图片下载完成")
+    fsBucket.find({
+      filename: request.body.msg
+    }).toArray(function (err: any, files: any) {
+      assert.ifError(err)
+      if (!files || files.length === 0) {
+        response.writeHead(404, {'Content-Type': 'text/html'})
+        response.end("找不到图片")
+        return
+      }
+      cl(files[0])
+      response.writeHead(200, {
+        'Content-Type': 'mimetype',
+        'Content-disposition': contentDisposition(files[0].filename),
+        'Content-Length': files[0].length
+      })
+      fsBucket.openDownloadStreamByName(request.body.msg).pipe(response)
+    })
   })
 
   app.post(PUB_CONST.API_FILE, function (request: any, response: any) {

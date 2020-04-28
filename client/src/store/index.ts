@@ -104,13 +104,13 @@ const store = new Vuex.Store({
       store.state.connection.send(fnBuildMsg(MSG_TYPE.GET_FRIENDS, store.state.userName))
     },
 
-    fnSendImageByConnection: function (state: any, imageContent: any) {
+    fnSendImageByConnection: function (state: any, imageAndCallback: any) {
       cl('要发送的图片文件如下')
-      cl(imageContent)
+      cl(imageAndCallback)
       cl('发送图片到服务器')
       const param = new FormData()
       // TODO 上传文件时验证用户身份
-      param.append(PUB_CONST.UPLOAD_FILE_NAME, imageContent)
+      param.append(PUB_CONST.UPLOAD_FILE_NAME, imageAndCallback.imgFile)
       param.append('sender', store.state.userName)
       param.append('password', store.state.userName)
       param.append('receiver', store.state.strCurrentChatPartner)
@@ -129,27 +129,36 @@ const store = new Vuex.Store({
         cl('上传完成')
         // TODO 上传完成
         cl(response)
+        imageAndCallback.callback(true)
       }, function (err) {
         ce('上传失败')
         ce(err)
+        imageAndCallback.callback(false)
       })
     },
 
-    fnGetImageByConnection: function (state: any, imageMsgItem: any) {
+    fnGetImageByConnection: function (state: any, itemAndCallback: any) {
       // TODO 从服务器下载图片
       cl('下载图片')
-      cl(imageMsgItem)
+      cl(itemAndCallback)
       // TODO 下载文件时验证用户身份
-      axios.post(PUB_CONST.DOWNLOAD_IMG_URL, {
-        sender: imageMsgItem.sender,
-        password: imageMsgItem.sender,
-        receiver: imageMsgItem.receiver,
-        timestamp: imageMsgItem.timestamp,
-        type: imageMsgItem.type
+      axios({
+        url: PUB_CONST.DOWNLOAD_IMG_URL,
+        method: "POST",
+        data: {
+          sender: itemAndCallback.msgItem.sender,
+          password: itemAndCallback.msgItem.sender,
+          receiver: itemAndCallback.msgItem.receiver,
+          timestamp: itemAndCallback.msgItem.timestamp,
+          type: itemAndCallback.msgItem.type,
+          msg: itemAndCallback.msgItem.msg
+        },
+        responseType: 'blob'
       }).then(function (response) {
         cl('下载完成')
         // TODO 下载完成
         cl(response)
+        itemAndCallback.callback(response.data)
       }, function (err) {
         ce('下载失败')
         ce(err)

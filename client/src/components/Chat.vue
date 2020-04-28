@@ -127,8 +127,20 @@
       fnSendImage() {
         if (!this.$refs.pictureInput.image) return
         console.log('此处发送图片')
-        store.commit('fnSendImageByConnection',
-          this.$refs.pictureInput.file)
+        store.commit('fnSendImageByConnection', {
+          imgFile: this.$refs.pictureInput.file,
+          callback: function (uploadResult) {
+            if (uploadResult) {
+              console.log('图片发送成功')
+              // 刷新聊天窗口
+              store.state.intUploadProgress = 0
+              store.commit('fnGetHistoryMsgByConnection')
+            } else {
+              console.error('图片发送失败')
+              // TODO 图片发送失败
+            }
+          }
+        })
       },
       fnSendFile() {
         if (this.fileToBeUpload === null) return
