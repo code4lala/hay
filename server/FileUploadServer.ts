@@ -8,6 +8,9 @@ export default function () {
   const multer = require('multer')
   const cors = require('cors')
   const app = express()
+  const bodyParser = require('body-parser')
+  const jsonParser = bodyParser.json()
+  const urlencodedParser = bodyParser.urlencoded({ extended: false })
   const fs = require('fs')
   const assert = require('assert')
   const storage = multer.diskStorage({
@@ -59,13 +62,20 @@ export default function () {
           cl(insertData)
           dbo.collection('chat_history').insertOne(insertData, function (err: any) {
             if (err) throw err
-            clt('保存图片聊天记录' + request.file.originname + '成功')
+            clt('保存图片聊天记录' + request.file.filename + '成功')
           })
           response.writeHead(200, {'Content-Type': 'text/html'})
           response.end("Image is uploaded")
         })
     })
   })
+  app.post(PUB_CONST.DOWNLOAD_IMAGE, jsonParser, function (request: any, response: any) {
+    clt('接收到下载图片的请求')
+    cl(request.body)
+    response.writeHead(200, {'Content-Type': 'text/html'})
+    response.end("图片下载完成")
+  })
+
   app.post(PUB_CONST.API_FILE, function (request: any, response: any) {
     upload(request, response, function (err: any) {
       clt('保存文件了 文件名如下')
@@ -91,7 +101,7 @@ export default function () {
       cl(insertData)
       dbo.collection('chat_history').insertOne(insertData, function (err: any) {
         if (err) throw err
-        clt('保存文件聊天记录' + request.file.originname + '成功')
+        clt('保存文件聊天记录' + request.file.filename + '成功')
       })
 
       response.writeHead(200, {'Content-Type': 'text/html'})

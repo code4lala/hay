@@ -28,6 +28,7 @@ const store = new Vuex.Store({
     arrayHistoryMsgItems: [],
     strCurrentChatPartner: '',
     intUploadProgress: 0,
+    intDownloadProgress: 0,
   },
   mutations: {
     fnInitConnection() {
@@ -130,6 +131,27 @@ const store = new Vuex.Store({
         cl(response)
       }, function (err) {
         ce('上传失败')
+        ce(err)
+      })
+    },
+
+    fnGetImageByConnection: function (state: any, imageMsgItem: any) {
+      // TODO 从服务器下载图片
+      cl('下载图片')
+      cl(imageMsgItem)
+      // TODO 下载文件时验证用户身份
+      axios.post(PUB_CONST.DOWNLOAD_IMG_URL, {
+        sender: imageMsgItem.sender,
+        password: imageMsgItem.sender,
+        receiver: imageMsgItem.receiver,
+        timestamp: imageMsgItem.timestamp,
+        type: imageMsgItem.type
+      }).then(function (response) {
+        cl('下载完成')
+        // TODO 下载完成
+        cl(response)
+      }, function (err) {
+        ce('下载失败')
         ce(err)
       })
     },
