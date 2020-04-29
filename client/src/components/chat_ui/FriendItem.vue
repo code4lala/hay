@@ -6,7 +6,8 @@
       v-bind:class="{'friend-selected':strFriendName===selectedFriend}"
   >
     <b-avatar
-        v-bind:text='strFriendName.substring(strFriendName.length-2)'
+        v-bind:text='strFriendName===$store.state.userName ? "我" : strFriendName.substring(strFriendName.length-2)'
+        v-bind:variant='strFriendName===$store.state.userName ? "primary" : "secondary"'
         class='mr-3'
         v-bind:badge='intNewMsgCount>0?intNewMsgCount+"":false'
         badge-variant='light'

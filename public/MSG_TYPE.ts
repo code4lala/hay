@@ -5,6 +5,7 @@ enum MSG_TYPE {
   GET_CHAT_HISTORY, // 请求聊天记录
   SEND_IMAGE, // 发送图片
   SEND_FILE, // 发送文件
+  SEND_AUDIO, // 发送语音消息
 }
 
 export default MSG_TYPE

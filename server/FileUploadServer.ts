@@ -55,14 +55,16 @@ export default function () {
         })
         .on('finish', function () {
           clt('存入数据库' + request.file.filename + '成功')
-          let msgType=''
+          let msgType = ''
           switch (request.body.type) {
             case MSG_TYPE.SEND_IMAGE.toString():
-              msgType='image'
+              msgType = 'image'
               break
             case MSG_TYPE.SEND_FILE.toString():
-              msgType='file'
+              msgType = 'file'
               break
+            case MSG_TYPE.SEND_AUDIO.toString():
+              msgType = 'audio'
           }
           const insertData = {
             sender: request.body.sender,

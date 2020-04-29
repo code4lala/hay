@@ -19,7 +19,7 @@ export let fnNotifyNewMsg = function (data: any) {
         data: data
       }))
       clt('已通知对方有新消息')
-      return // TODO 改成break
+      // 此处不能查找第一个之后就return或者break 因为用户可能多端登录
     }
   }
   // TODO 删掉debug

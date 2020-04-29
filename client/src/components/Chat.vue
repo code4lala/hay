@@ -15,29 +15,29 @@
         </el-main>
         <el-footer>
           <div style='text-align: center'>
-          <b-button-group>
-            <!-- see https://bootstrap-vue.js.org/docs/icons choose icons -->
-            <b-button variant='light' v-on:click='strInputState = (strInputState === "image" ? "text" : "image")'>
-              <b-avatar icon='image' variant="light"></b-avatar>
-              图片
-            </b-button>
-            <b-button variant='light' v-on:click='strInputState = (strInputState === "file" ? "text" : "file")'>
-              <b-avatar icon='file-earmark' variant="light"></b-avatar>
-              文件
-            </b-button>
-            <b-button variant='light' v-on:click='strInputState = (strInputState === "audio" ? "text" : "audio")'>
-              <b-avatar icon='play' variant="light"></b-avatar>
-              语音
-            </b-button>
-            <b-button variant='light'>
-              <b-avatar icon='soundwave' variant="light"></b-avatar>
-              语音聊天
-            </b-button>
-            <b-button variant='light'>
-              <b-avatar icon='camera-video' variant="light"></b-avatar>
-              视频聊天
-            </b-button>
-          </b-button-group>
+            <b-button-group>
+              <!-- see https://bootstrap-vue.js.org/docs/icons choose icons -->
+              <b-button variant='light' v-on:click='strInputState = (strInputState === "image" ? "text" : "image")'>
+                <b-avatar icon='image' variant="light"></b-avatar>
+                图片
+              </b-button>
+              <b-button variant='light' v-on:click='strInputState = (strInputState === "file" ? "text" : "file")'>
+                <b-avatar icon='file-earmark' variant="light"></b-avatar>
+                文件
+              </b-button>
+              <b-button variant='light' v-on:click='strInputState = (strInputState === "audio" ? "text" : "audio")'>
+                <b-avatar icon='play' variant="light"></b-avatar>
+                语音
+              </b-button>
+              <b-button variant='light'>
+                <b-avatar icon='soundwave' variant="light"></b-avatar>
+                语音聊天
+              </b-button>
+              <b-button variant='light'>
+                <b-avatar icon='camera-video' variant="light"></b-avatar>
+                视频聊天
+              </b-button>
+            </b-button-group>
           </div>
           <div style='text-align: center; margin: 0.5em'>
             <el-input
@@ -101,7 +101,7 @@
   import FriendList from '@/components/chat_ui/FriendList.vue'
   import store from '@/store'
   import PictureInput from 'vue-picture-input'
-  import Recorderx, { ENCODE_TYPE } from "recorderx"
+  import Recorderx, {ENCODE_TYPE} from 'recorderx'
   import MSG_TYPE from '../../../public/MSG_TYPE'
 
   const rc = new Recorderx()
@@ -192,7 +192,7 @@
       fnRecordPause() {
         rc.pause()
         console.log('暂停录制')
-        this.wavRecord=rc.getRecord({
+        this.wavRecord = rc.getRecord({
           encodeTo: ENCODE_TYPE.WAV,
           compressible: true
         })
@@ -201,13 +201,27 @@
       fnRecordClear() {
         rc.clear()
         console.log('清除录音')
-        this.wavRecord=null
-        this.strRecordBlobUrl=''
+        this.wavRecord = null
+        this.strRecordBlobUrl = ''
       },
       fnSendRecord() {
-        if(this.wavRecord===null)return
+        if (this.wavRecord === null) return
         console.log('发送语音消息')
         console.log(this.wavRecord)
+        store.commit('fnSendFileByConnection', {
+          file: this.wavRecord,
+          sendMsgType: MSG_TYPE.SEND_AUDIO,
+          callback: function (uploadResult) {
+            if (uploadResult) {
+              console.log('语音消息发送成功')
+              store.state.intUploadProgress = 0
+              store.commit('fnGetHistoryMsgByConnection')
+            } else {
+              console.error('语音消息发送失败')
+              // TODO 文件发送失败
+            }
+          }
+        })
       }
     },
     components: {

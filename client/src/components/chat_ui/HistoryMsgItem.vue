@@ -1,4 +1,5 @@
 <template>
+  <!--text | image | file | audio-->
   <li v-if='msgItem.type==="image"'>
     {{msgItem.sender}} @ {{new Date(msgItem.timestamp).toLocaleString()}} :
     <br>
@@ -14,6 +15,7 @@
   </li>
   <li v-else-if='msgItem.type==="audio"'>
     {{msgItem.sender}} @ {{new Date(msgItem.timestamp).toLocaleString()}} :
+    <br>
     <!--suppress HtmlUnknownTarget -->
     <audio controls v-bind:src='strAudioSrc'></audio>
     <!--suppress HtmlUnknownTarget -->
@@ -26,7 +28,6 @@
 
 <script lang='js'>
   import store from '../../store'
-  import PUB_CONST from '../../../../public/PUB_CONST';
 
   export default {
     name: 'HistoryMsgItem',
@@ -65,7 +66,21 @@
       fnGetAudio: function () {
         // TODO 获取音频消息
         console.log('获取音频消息')
-        return ''
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const that = this
+        if (this.bSucceedGotAudio) return
+        store.commit('fnGetFileByConnection', {
+          msgItem: this.msgItem,
+          callback: function (audio) {
+            console.log('回调设置语音消息地址')
+            console.log(audio)
+            const audioUrl = URL.createObjectURL(audio)
+            console.log(audioUrl)
+            that.strAudioSrc = audioUrl
+            that.bSucceedGotAudio = true
+          }
+        })
+        return this.strAudioSrc
       },
     },
     methods: {
