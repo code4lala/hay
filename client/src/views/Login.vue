@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class='logo_img' style='text-align: center'>
+  <div style='text-align: center'>
+    <div class='logo_img'>
       <img src='../assets/logo.png' alt='How are you!'>
     </div>
     <el-input
@@ -19,6 +19,10 @@
     >
       <template slot='prepend'>密码</template>
     </el-input>
+    <el-button v-on:click.native='fnLogin'
+               style='margin-top: 5px'>
+      登录
+    </el-button>
   </div>
 </template>
 

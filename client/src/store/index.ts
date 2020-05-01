@@ -35,7 +35,7 @@ const store = new Vuex.Store({
       cl('init websocket...')
 
       // 开启连接
-      store.state.connection = new WebSocket('ws://127.0.0.1:10086')
+      store.state.connection = new WebSocket(PUB_CONST.WEBSOCKET_SERVER_URL)
 
       store.state.connection.binaryType = 'arraybuffer'
 
