@@ -6,6 +6,7 @@ enum MSG_TYPE {
   SEND_IMAGE, // 发送图片
   SEND_FILE, // 发送文件
   SEND_AUDIO, // 发送语音消息
+  REGISTER, // 注册新用户
 }
 
 export default MSG_TYPE

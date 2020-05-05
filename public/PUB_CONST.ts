@@ -6,7 +6,7 @@ function fnGetIp() {
   let IPv4 = '127.0.0.1'
   for (const key in interfaces) {
     interfaces[key].forEach(function (details: any) {
-      if (details.family == 'IPv4' && key == '以太网') {
+      if (details.family === 'IPv4' && key === '以太网') {
         IPv4 = details.address.toString()
         clt(details.address + ' ' + key)
       }

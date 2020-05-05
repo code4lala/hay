@@ -84,10 +84,16 @@ const store = new Vuex.Store({
       cl('发送消息完成')
     },
 
-    fnLoginByConnection: function (state: any, userName: string) {
-      cl('登录用户名为' + userName)
-      store.state.connection.send(fnBuildMsg(MSG_TYPE.LOGIN, userName))
+    fnLoginByConnection: function (state: any, user: any) {
+      cl('登录用户为' + user)
+      store.state.connection.send(fnBuildMsg(MSG_TYPE.LOGIN, user))
       cl('正在登录')
+    },
+
+    fnRegisterByConnection: function (state: any, content: any) {
+      cl('注册用户信息如下')
+      store.state.connection.send(fnBuildMsg(MSG_TYPE.REGISTER, content))
+      cl('申请注册中')
     },
 
     fnGetHistoryMsgByConnection: function () {
@@ -223,6 +229,23 @@ MSG_HANDLER[MSG_BACK_TYPE.GOT_NEW_MSG] = function (data: any) {
     }).intNewMsgCount++
     // TODO 新消息提醒
   }
+}
+MSG_HANDLER[MSG_BACK_TYPE.REGISTER_SUCC] = function (data: any) {
+  alert('注册成功')
+}
+MSG_HANDLER[MSG_BACK_TYPE.REGISTER_FAIL] = function (data: any) {
+  let failMsg = ' '
+  switch (data.errorCode) {
+    case MSG_BACK_TYPE.REGISTER_FAIL_INVITE_INVALID: {
+      failMsg += '邀请码无效'
+      break
+    }
+    case MSG_BACK_TYPE.REGISTER_FAIL_USERNAME_INVALID: {
+      failMsg += '用户名无效'
+      break
+    }
+  }
+  alert('注册失败' + failMsg)
 }
 
 

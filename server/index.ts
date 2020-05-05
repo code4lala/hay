@@ -9,32 +9,39 @@ import FileUploadServer from "./FileUploadServer";
 
 FileUploadServer()
 
+const assert = require('assert')
+const AsyncLock = require('async-lock')
+// 注册用户同步锁
+const lock = new AsyncLock()
+const LOCK_SIGN_UP = 'sign_up'
+
 process.title = 'how_are_you_server'
 const WebSocketServer = require('websocket').server
 const http = require('http')
 
 let MSG_HANDLER: any = []
-MSG_HANDLER[MSG_TYPE.LOGIN] = function (conn: any, data: string, index: any) {
+MSG_HANDLER[MSG_TYPE.LOGIN] = function (conn: any, data: any, index: any) {
   clt('登录处理器')
   dbo.collection('user').find({
-    name: data
+    name: data.name,
+    password: data.password
   }).toArray(function (err: any, result: Array<any>) {
     if (err) throw err
     cl(result)
     if (result.length >= 1) {
-      clt('查询有该用户，登录成功')
+      clt('查询有该用户，且密码正确，登录成功')
       conn.sendUTF(JSON.stringify({
         type: MSG_BACK_TYPE.LOGIN_SUCC,
-        data: data
+        data: data.name
       }))
       // 服务端设置该登录成功用户的ID
-      clients[index].id = data
+      clients[index].id = data.name
       clt('当前有' + clients.length + '个已连接用户')
     } else {
-      clt('用户不存在，登录失败')
+      clt('用户不存在或密码错误，登录失败')
       conn.sendUTF(JSON.stringify({
         type: MSG_BACK_TYPE.LOGIN_FAIL,
-        data: data
+        data: data.name
       }))
     }
   })
@@ -96,10 +103,82 @@ MSG_HANDLER[MSG_TYPE.GET_FRIENDS] = function (conn: any, data: string) {
     }))
   })
 }
-MSG_HANDLER[MSG_TYPE.SEND_IMAGE] = function (conn: any, data: any) {
-  clt('发送图片处理器')
+MSG_HANDLER[MSG_TYPE.REGISTER] = function (conn: any, data: any) {
+  clt('注册处理器')
   cl(data)
-  cl(data.imageFile)
+  lock.acquire(LOCK_SIGN_UP, function () {
+    // Concurrency safe 并发安全
+    dbo.collection('invite_code').find({
+      id: data.inviteCode,
+      count: {$gt: 0}
+    }).toArray(function (err: any, result: Array<any>) {
+      assert.ifError(err)
+      cl(result)
+      if (result.length === 0) {
+        clt('邀请码无效')
+        return conn.sendUTF(JSON.stringify({
+          type: MSG_BACK_TYPE.REGISTER_FAIL,
+          data: {
+            errorCode: MSG_BACK_TYPE.REGISTER_FAIL_INVITE_INVALID
+          }
+        }))
+      } else {
+        clt('查询到邀请码 ' + result[0].id + ' 剩余有效个数 ' + result[0].count)
+        const reservedCount = result[0].count
+        dbo.collection('user').find({
+          name: data.userName
+        }).toArray(function (err: any, result: Array<any>) {
+          assert.ifError(err)
+          cl(result)
+          if (result.length !== 0) {
+            cl('已经存在用户名是 ' + data.userName + ' 的用户了')
+            return conn.sendUTF(JSON.stringify({
+              type: MSG_BACK_TYPE.REGISTER_FAIL,
+              data: {
+                errorCode: MSG_BACK_TYPE.REGISTER_FAIL_USERNAME_INVALID
+              }
+            }))
+          } else {
+            cl(data)
+            clt('邀请码和用户名都有效')
+            dbo.collection('user').insertOne({
+              name: data.userName,
+              password: data.password,
+              inviteCode: data.inviteCode
+            }, function (err: any) {
+              assert.ifError(err)
+              dbo.collection('invite_code').updateOne({
+                id: data.inviteCode
+              }, {
+                $set: {
+                  count: reservedCount - 1
+                }
+              }, function (err: any, result: any) {
+                assert.ifError(err)
+                clt('注册成功，邀请码扣除成功')
+                // 后台数据库插入自己和自己是好友关系，前台直接返回注册成功结果
+                dbo.collection('friend_list').insertOne({
+                  a: data.userName,
+                  b: data.userName
+                }, function (err: any) {
+                  assert.ifError(err)
+                })
+                return conn.sendUTF(JSON.stringify({
+                  type: MSG_BACK_TYPE.REGISTER_SUCC,
+                  data: {
+                    errorCode: MSG_BACK_TYPE.REGISTER_SUCC
+                  }
+                }))
+              })
+            })
+          }
+        })
+      }
+    })
+  }, function (err: any, ret: any) {
+    // lock released 事后
+    assert.ifError(err)
+  });
 }
 
 // HTTP server

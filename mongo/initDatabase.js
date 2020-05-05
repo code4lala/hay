@@ -5,14 +5,24 @@ use hay
 db.dropDatabase()
 use hay
 
+db.createCollection('invite_code')
+db.invite_code.insert([{
+    id: '123456789qwer',
+		count: 2
+}])
+db.invite_code.find()
+
 // 新增几个用户
 db.createCollection('user')
 db.user.insert([{
-    name: '小可爱'
+    name: '小可爱',
+		password: '1'
 }, {
-    name: '小美丽'
+    name: '小美丽',
+		password: '1'
 }, {
-    name: '小漂亮'
+    name: '小漂亮',
+		password: '1'
 }])
 db.user.find()
 
