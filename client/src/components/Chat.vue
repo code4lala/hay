@@ -2,6 +2,38 @@
   <el-container>
     <el-container>
       <el-aside width='15em' style='overflow-x: hidden'>
+        <div>
+          <el-input placeholder='回车确认' v-model="strAddFriend"
+                    v-on:keydown.enter.native='fnAddFriend'
+          >
+            <template slot="prepend">加好友</template>
+          </el-input>
+          <el-input placeholder='回车确认' v-model="strAddFriendMsg"
+                    v-on:keydown.enter.native='fnAddFriend'
+          >
+            <template slot="prepend">加好友申请消息</template>
+          </el-input>
+        </div>
+        <div v-if='$store.state.newFriendItem!==null'>
+          好友申请来自: {{$store.state.newFriendItem.sender}} <br>
+          申请信息: {{$store.state.newFriendItem.msg}} <br>
+          <el-button-group>
+            <el-button
+                type="success"
+                v-on:click='fnHandleNewFriendRequest(true)'>同意
+            </el-button>
+            <el-button
+                type="danger"
+                v-on:click='fnHandleNewFriendRequest(false)'>拒绝
+            </el-button>
+          </el-button-group>
+          <el-input
+              v-model='strDenyFriendMsg'
+              v-on:keydown.enter.native='fnHandleNewFriendRequest(false)'
+              placeholder='回车确认'>
+            <template slot="prepend">可选回复消息</template>
+          </el-input>
+        </div>
         <FriendList
             v-bind:array-friend-items='$store.state.arrayFriendItems'
             v-bind:selectedFriend='$store.state.strCurrentChatPartner'>
@@ -28,14 +60,6 @@
               <b-button variant='light' v-on:click='strInputState = (strInputState === "audio" ? "text" : "audio")'>
                 <b-avatar icon='play' variant="light"></b-avatar>
                 语音
-              </b-button>
-              <b-button variant='light'>
-                <b-avatar icon='soundwave' variant="light"></b-avatar>
-                语音聊天
-              </b-button>
-              <b-button variant='light'>
-                <b-avatar icon='camera-video' variant="light"></b-avatar>
-                视频聊天
               </b-button>
             </b-button-group>
           </div>
@@ -116,6 +140,10 @@
         fileToBeUpload: null,
         wavRecord: null,
         strRecordBlobUrl: '',
+
+        strAddFriend: '',
+        strAddFriendMsg: '',
+        strDenyFriendMsg: '',
       }
     },
     methods: {
@@ -221,6 +249,25 @@
               // TODO 文件发送失败
             }
           }
+        })
+      },
+
+      fnAddFriend: function () {
+        console.log('加好友 ' + this.strAddFriend)
+        store.commit('fnAddFriendByConnection', {
+          sender: store.state.userName,
+          receiver: this.strAddFriend,
+          msg: this.strAddFriendMsg
+        })
+      },
+      fnHandleNewFriendRequest: function (response) {
+        console.log('反馈好友申请')
+        console.log(response)
+        store.commit('fnResponseFriendAddRequestByConnection', {
+          sender: store.state.userName,
+          receiver: store.state.newFriendItem.sender,
+          response: response,
+          msg: this.strDenyFriendMsg
         })
       }
     },

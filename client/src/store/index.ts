@@ -23,12 +23,13 @@ function fnBuildMsg(type: MSG_TYPE, content: any): string {
 const store = new Vuex.Store({
   state: {
     connection: null,
-    userName: '',
-    arrayFriendItems: [],
-    arrayHistoryMsgItems: [],
-    strCurrentChatPartner: '',
-    intUploadProgress: 0,
-    intDownloadProgress: 0,
+    userName: '', // 当前登录用户id
+    arrayFriendItems: [], // 好友列表
+    arrayHistoryMsgItems: [], // 聊天记录
+    strCurrentChatPartner: '', // 当前聊天对象
+    intUploadProgress: 0, // 上传进度
+    intDownloadProgress: 0, // 下载进度
+    newFriendItem: null, // 新的好友申请
   },
   mutations: {
     fnInitConnection() {
@@ -170,6 +171,18 @@ const store = new Vuex.Store({
         ce(err)
       })
     },
+
+    fnAddFriendByConnection: function (state: any, friendItem: any) {
+      cl('此处加好友')
+      cl(friendItem)
+      store.state.connection.send(fnBuildMsg(MSG_TYPE.ADD_FRIEND, friendItem))
+    },
+
+    fnResponseFriendAddRequestByConnection: function (state: any, responseItem) {
+      cl('此处回应加好友申请')
+      cl(responseItem)
+      store.state.connection.send(fnBuildMsg(MSG_TYPE.RESPONSE_TO_ADD_FRIEND, responseItem))
+    }
   },
   actions: {},
   modules: {}
@@ -246,6 +259,29 @@ MSG_HANDLER[MSG_BACK_TYPE.REGISTER_FAIL] = function (data: any) {
     }
   }
   alert('注册失败' + failMsg)
+}
+MSG_HANDLER[MSG_BACK_TYPE.GOT_NEW_FRIEND_APPLICATION] = function (data: any) {
+  cl('有人加好友')
+  cl(data)
+  store.state.newFriendItem = data
+}
+MSG_HANDLER[MSG_BACK_TYPE.GOT_NEW_FRIEND_REQUEST_RESPONSE] = function (data: any) {
+  cl('有人回复好友申请')
+  cl(data)
+  if(data.response) {
+    alert(data.sender+' 同意了你的好友申请' + ' 回复消息: ' + data.msg)
+    cl('刷新好友列表')
+    store.commit('fnGetFriendsByConnection')
+  }else {
+    alert(data.sender+' 拒绝了你的好友申请' + ' 回复消息: ' + data.msg)
+  }
+}
+MSG_HANDLER[MSG_BACK_TYPE.GOT_NEW_FRIEND_ADD_SUCCEED] = function (data: any) {
+  cl('请求的好友申请被对方通过了')
+  cl(data)
+  alert('您已同意了 ' + data.sender + ' 的好友申请')
+  cl('刷新好友列表')
+  store.commit('fnGetFriendsByConnection')
 }
 
 

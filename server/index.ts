@@ -4,7 +4,13 @@ import MSG_TYPE from "../public/MSG_TYPE"
 import PUB_CONST from "../public/PUB_CONST";
 import {clt, cl, cet, ce} from "./Util";
 import {dbo} from "./MongoDBObject";
-import {clients, fnNotifyNewMsg} from "./ServerVar";
+import {
+  clients,
+  fnNotifyAddFriend,
+  fnNotifyAddFriendSucceed,
+  fnNotifyNewMsg,
+  fnNotifyResponseAddFriend
+} from "./ServerVar";
 import FileUploadServer from "./FileUploadServer";
 
 FileUploadServer()
@@ -180,6 +186,42 @@ MSG_HANDLER[MSG_TYPE.REGISTER] = function (conn: any, data: any) {
     assert.ifError(err)
   });
 }
+MSG_HANDLER[MSG_TYPE.ADD_FRIEND] = function (conn: any, data: any) {
+  clt('加好友处理器')
+  cl(data)
+  fnNotifyAddFriend(data)
+}
+MSG_HANDLER[MSG_TYPE.RESPONSE_TO_ADD_FRIEND] = function (conn: any, data: any) {
+  clt('回复加好友处理器')
+  cl(data)
+  if(data.response) {
+    // 同意加好友 将好友关系写入数据库
+    const insertData=[{
+      a: data.sender,
+      b: data.receiver
+    },{
+      a: data.receiver,
+      b: data.sender
+    }]
+    cl(insertData)
+    dbo.collection('friend_list').insertMany(insertData, function (err: any) {
+      assert.ifError(err)
+      clt(data.sender + ' 和 ' + data.receiver + ' 添加好友成功')
+      // 通知被加好友一方
+      fnNotifyResponseAddFriend(data)
+      // 通知加好友一方
+      fnNotifyAddFriendSucceed({
+        sender: data.receiver,
+        receiver: data.sender,
+        msg: data.msg
+      })
+    })
+  } else {
+    // 拒绝好友申请
+    fnNotifyResponseAddFriend(data)
+  }
+}
+
 
 // HTTP server
 const server = http.createServer(function (request: IncomingMessage, response: ServerResponse) {

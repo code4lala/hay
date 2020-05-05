@@ -7,6 +7,8 @@ enum MSG_TYPE {
   SEND_FILE, // 发送文件
   SEND_AUDIO, // 发送语音消息
   REGISTER, // 注册新用户
+  ADD_FRIEND, // 加好友
+  RESPONSE_TO_ADD_FRIEND, // 回应加好友
 }
 
 export default MSG_TYPE
