@@ -194,12 +194,12 @@ MSG_HANDLER[MSG_TYPE.ADD_FRIEND] = function (conn: any, data: any) {
 MSG_HANDLER[MSG_TYPE.RESPONSE_TO_ADD_FRIEND] = function (conn: any, data: any) {
   clt('回复加好友处理器')
   cl(data)
-  if(data.response) {
+  if (data.response) {
     // 同意加好友 将好友关系写入数据库
-    const insertData=[{
+    const insertData = [{
       a: data.sender,
       b: data.receiver
-    },{
+    }, {
       a: data.receiver,
       b: data.sender
     }]

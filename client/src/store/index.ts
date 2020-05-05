@@ -268,12 +268,12 @@ MSG_HANDLER[MSG_BACK_TYPE.GOT_NEW_FRIEND_APPLICATION] = function (data: any) {
 MSG_HANDLER[MSG_BACK_TYPE.GOT_NEW_FRIEND_REQUEST_RESPONSE] = function (data: any) {
   cl('有人回复好友申请')
   cl(data)
-  if(data.response) {
-    alert(data.sender+' 同意了你的好友申请' + ' 回复消息: ' + data.msg)
+  if (data.response) {
+    alert(data.sender + ' 同意了你的好友申请' + ' 回复消息: ' + data.msg)
     cl('刷新好友列表')
     store.commit('fnGetFriendsByConnection')
-  }else {
-    alert(data.sender+' 拒绝了你的好友申请' + ' 回复消息: ' + data.msg)
+  } else {
+    alert(data.sender + ' 拒绝了你的好友申请' + ' 回复消息: ' + data.msg)
   }
 }
 MSG_HANDLER[MSG_BACK_TYPE.GOT_NEW_FRIEND_ADD_SUCCEED] = function (data: any) {
