@@ -69,7 +69,7 @@
   import store from '@/store/index'
 
   export default {
-    name: 'client-login',
+    name: 'Login',
     components: {},
     data: function () {
       return {

@@ -1,7 +1,6 @@
 import Vue from "vue";
 import axios from 'axios'
 import Vuex from "vuex";
-import router from "@/router";
 import MSG_BACK_TYPE from "../../../public/MSG_BACK_TYPE"
 import MSG_TYPE from "../../../public/MSG_TYPE"
 import PUB_CONST from "../../../public/PUB_CONST";
@@ -191,7 +190,7 @@ const store = new Vuex.Store({
 MSG_HANDLER[MSG_BACK_TYPE.LOGIN_SUCC] = function (data: string) {
   cl('登录成功啦')
   cl('服务端返回的消息为: ' + data)
-  router.push('/')
+  // 设置用户名后会自动跳转到聊天界面
   store.state.userName = data
   store.state.strCurrentChatPartner = data
   store.commit('fnGetFriendsByConnection', data)
