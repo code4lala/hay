@@ -2,7 +2,7 @@
 import PUB_CONST from "../public/PUB_CONST"
 import {clt, cl, cet, ce} from "./Util"
 import {dbo, fsBucket} from "./MongoDBObject"
-import {fnNotifyNewMsg} from "./ServerVar";
+import {fnNotifyNewMsg, key, cert} from "./ServerVar";
 import MSG_TYPE from "../public/MSG_TYPE";
 
 export default function () {
@@ -110,7 +110,10 @@ export default function () {
     })
   })
 
-  app.listen(PUB_CONST.FILE_SERVER_PORT, function () {
+  const https = require('https')
+  const httpsServer = https.createServer({key: key, cert: cert}, app)
+  
+  httpsServer.listen(PUB_CONST.FILE_SERVER_PORT, function () {
     clt("文件上传服务器运行在端口 " + PUB_CONST.FILE_SERVER_PORT)
   })
 }

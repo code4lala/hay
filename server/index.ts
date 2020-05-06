@@ -1,4 +1,3 @@
-import {IncomingMessage, ServerResponse} from "http";
 import MSG_BACK_TYPE from "../public/MSG_BACK_TYPE"
 import MSG_TYPE from "../public/MSG_TYPE"
 import PUB_CONST from "../public/PUB_CONST";
@@ -9,7 +8,9 @@ import {
   fnNotifyAddFriend,
   fnNotifyAddFriendSucceed,
   fnNotifyNewMsg,
-  fnNotifyResponseAddFriend
+  fnNotifyResponseAddFriend,
+  key,
+  cert
 } from "./ServerVar";
 import FileUploadServer from "./FileUploadServer";
 
@@ -23,7 +24,7 @@ const LOCK_SIGN_UP = 'sign_up'
 
 process.title = 'how_are_you_server'
 const WebSocketServer = require('websocket').server
-const http = require('http')
+const https = require('https')
 
 let MSG_HANDLER: any = []
 MSG_HANDLER[MSG_TYPE.LOGIN] = function (conn: any, data: any, index: any) {
@@ -223,9 +224,10 @@ MSG_HANDLER[MSG_TYPE.RESPONSE_TO_ADD_FRIEND] = function (conn: any, data: any) {
 }
 
 
-// HTTP server
-const server = http.createServer(function (request: IncomingMessage, response: ServerResponse) {
-  clt('创建http server' + request + response)
+// HTTPS server
+const server = https.createServer({
+  key: key,
+  cert: cert
 })
 server.listen(PUB_CONST.SERVER_PORT, function () {
   clt('正在监听端口' + PUB_CONST.SERVER_PORT)

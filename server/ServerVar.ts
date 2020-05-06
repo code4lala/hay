@@ -1,6 +1,10 @@
 import {cl, clt} from "./Util";
 import MSG_BACK_TYPE from "../public/MSG_BACK_TYPE";
 
+const fs = require('fs')
+export const key = fs.readFileSync("/etc/letsencrypt/live/cloud.code4lala.vip/privkey.pem")
+export const cert = fs.readFileSync("/etc/letsencrypt/live/cloud.code4lala.vip/fullchain.pem")
+
 export let clients: any = []
 /**
  * @param data 一条聊天消息
