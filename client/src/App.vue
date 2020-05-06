@@ -1,12 +1,18 @@
 <template>
   <div id="app" style='margin: 10px'>
-    <router-view/>
+    <Home v-if='$store.state.userName!==""'>
+    </Home>
+    <Login v-else></Login>
   </div>
 </template>
 
 <script lang='js'>
+  import Home from '@/views/Home';
+  import Login from '@/views/Login';
+
   export default {
-    name: 'App'
+    name: 'App',
+    components: {Login, Home}
   }
 </script>
 
