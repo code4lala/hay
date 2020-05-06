@@ -16,4 +16,6 @@ https://cn.vuejs.org/v2/guide/components-slots.html#%E4%BD%9C%E7%94%A8%E5%9F%9F%
 作用域插槽 把内容绑定使在模板槽中可用
 
 
+screen -S hay 创建会话
+screen -r hay 重连
 
