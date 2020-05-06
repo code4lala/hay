@@ -3,9 +3,9 @@ export default class PUB_CONST {
   static readonly FILE_SERVER_PORT = 10010
   static readonly HOW_ARE_YOU_HOST = 'chat.code4lala.vip'
   static readonly HOW_ARE_YOU_URL =
-    'http://' + PUB_CONST.HOW_ARE_YOU_HOST
+    'https://' + PUB_CONST.HOW_ARE_YOU_HOST
   static readonly WEBSOCKET_SERVER_URL =
-    'ws://' + PUB_CONST.HOW_ARE_YOU_HOST + ':' +
+    'wss://' + PUB_CONST.HOW_ARE_YOU_HOST + ':' +
     PUB_CONST.SERVER_PORT
   static readonly API_FILE = '/api/file'
   static readonly DOWNLOAD_FILE = '/download/file'
