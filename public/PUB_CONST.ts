@@ -21,6 +21,6 @@ export default class PUB_CONST {
     PUB_CONST.DOWNLOAD_FILE
   // 用于 multer 的 single 的参数 和 POST 请求的 name
   static readonly UPLOAD_FILE_NAME = 'upload_file_name'
-  // 只允许该域名发送POST请求
-  static readonly ALLOWED_ORIGIN = PUB_CONST.HOW_ARE_YOU_URL + ':' + PUB_CONST.APP_FRONT_END_PORT
+  // 只允许该域名发送POST请求 因为https默认是44所以不用加端口号了
+  static readonly ALLOWED_ORIGIN = PUB_CONST.HOW_ARE_YOU_URL
 }
