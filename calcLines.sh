@@ -7,4 +7,5 @@ echo -e "vue行数\t$vue_len"
 echo -e "js行数\t$js_len"
 sum_len=`expr $ts_len + $vue_len + $js_len`
 echo -e "总行数\t$sum_len"
+read input
 
