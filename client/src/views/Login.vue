@@ -89,9 +89,8 @@
         console.log('即将发送网络请求进行登录...')
         console.log('用户名为: ' + this.strLoginName)
 
-        // TODO websocket secure
-        // TODO 密码登录
-
+        // 不管登录成功不成功，先把密码存起来，后续访问文件存取直接用这个密码
+        store.state.password = this.strLoginPassword
         // 调用发送消息的函数
         store.commit('fnLoginByConnection', {
           name: this.strLoginName,

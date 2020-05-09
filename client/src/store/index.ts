@@ -23,6 +23,7 @@ const store = new Vuex.Store({
   state: {
     connection: null,
     userName: '', // 当前登录用户id
+    password: '', // 当前登录用户密码
     arrayFriendItems: [], // 好友列表
     arrayHistoryMsgItems: [], // 聊天记录
     strCurrentChatPartner: '', // 当前聊天对象
@@ -118,7 +119,7 @@ const store = new Vuex.Store({
       // TODO 上传文件时验证用户身份
       param.append(PUB_CONST.UPLOAD_FILE_NAME, fileAndCallback.file)
       param.append('sender', store.state.userName)
-      param.append('password', store.state.userName)
+      param.append('password', store.state.password)
       param.append('receiver', store.state.strCurrentChatPartner)
       param.append('timestamp', (Date.now()).toString())
       param.append('type', fileAndCallback.sendMsgType.toString())
